@@ -1,0 +1,19 @@
+{
+  "name": "mvpmms-shop",
+  "version": "1.0.0",
+  "description": "MVPMMSHOP Game Top Up Platform",
+  "scripts": {
+    "dev:backend": "cd backend && npm run start:dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install && cd ../mobile && npm install"
+  },
+  "keywords": [
+    "game",
+    "topup",
+    "nestjs",
+    "nextjs",
+    "react-native"
+  ],
+  "author": "",
+  "license": "ISC"
+}
