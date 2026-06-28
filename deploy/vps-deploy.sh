@@ -39,17 +39,27 @@ npm run build
 mkdir -p uploads
 cd ..
 
+echo "==> Restart API (pick up new backend routes)"
+if pm2 describe rankage-api >/dev/null 2>&1; then
+  pm2 restart rankage-api
+else
+  pm2 start deploy/ecosystem.config.cjs --only rankage-api
+fi
+
 echo "==> Frontend"
 cd frontend
-npm ci
+if ! npm ci; then
+  echo "WARN: npm ci failed — running npm install to refresh lock/platform deps"
+  npm install
+fi
 npm run build
 cd ..
 
-echo "==> PM2"
-if pm2 describe rankage-api >/dev/null 2>&1; then
-  pm2 restart deploy/ecosystem.config.cjs
+echo "==> Restart web + save PM2"
+if pm2 describe rankage-web >/dev/null 2>&1; then
+  pm2 restart rankage-web
 else
-  pm2 start deploy/ecosystem.config.cjs
+  pm2 start deploy/ecosystem.config.cjs --only rankage-web
 fi
 pm2 save
 
@@ -59,4 +69,5 @@ pm2 status
 echo ""
 echo "Test locally on VPS:"
 echo "  curl -s http://127.0.0.1:4000/health"
+echo "  curl -s http://127.0.0.1:4000/games/popular?limit=3 | head -c 80"
 echo "  curl -sI http://127.0.0.1:3000/ | head -1"

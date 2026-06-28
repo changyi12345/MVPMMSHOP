@@ -47,10 +47,11 @@ export default function UserNotificationBell({ inHeader = false }: { inHeader?: 
       if (e.key === 'Escape') setOpen(false);
     };
 
-    document.addEventListener('click', onDocClick, true);
+    // Bubble phase — avoid closing before item click handlers run
+    document.addEventListener('click', onDocClick);
     document.addEventListener('keydown', onKey);
     return () => {
-      document.removeEventListener('click', onDocClick, true);
+      document.removeEventListener('click', onDocClick);
       document.removeEventListener('keydown', onKey);
     };
   }, [open]);
@@ -93,7 +94,19 @@ export default function UserNotificationBell({ inHeader = false }: { inHeader?: 
   };
 
   const panel = open ? (
-    <div className="user-notif-panel user-notif-panel--portal" ref={panelRef} role="dialog" aria-label={t('notifications')}>
+    <>
+      <div
+        className="user-notif-backdrop"
+        aria-hidden
+        onClick={() => setOpen(false)}
+      />
+      <div
+        className="user-notif-panel user-notif-panel--portal"
+        ref={panelRef}
+        role="dialog"
+        aria-label={t('notifications')}
+        onClick={(e) => e.stopPropagation()}
+      >
       <div className="user-notif-panel-head">
         <strong>{t('notifications')}</strong>
         <div className="user-notif-panel-actions">
@@ -142,6 +155,7 @@ export default function UserNotificationBell({ inHeader = false }: { inHeader?: 
         </Link>
       </div>
     </div>
+    </>
   ) : null;
 
   return (

@@ -3111,7 +3111,17 @@ a {
 
 .user-notif-panel--portal {
   position: fixed;
+  z-index: 1001;
+}
+
+.user-notif-backdrop {
+  position: fixed;
+  inset: 0;
   z-index: 1000;
+  background: rgba(15, 23, 42, 0.35);
+  border: none;
+  padding: 0;
+  margin: 0;
 }
 
 .user-notif-panel-head {
