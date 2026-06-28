@@ -3,27 +3,48 @@ import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
 import { colors, spacing } from '../theme/colors';
 import { fetchUnreadNotificationCount } from '../api/notifications';
 
+const POLL_MS = 30_000;
+
 interface Props {
   onPress: () => void;
   refreshKey?: number;
+  light?: boolean;
+  poll?: boolean;
 }
 
-export default function NotificationBell({ onPress, refreshKey = 0 }: Props) {
+export default function NotificationBell({
+  onPress,
+  refreshKey = 0,
+  poll = true,
+}: Props) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
-    fetchUnreadNotificationCount()
-      .then((res) => {
-        if (!cancelled) setCount(res.count);
-      })
-      .catch(() => {
-        if (!cancelled) setCount(0);
-      });
+
+    const refresh = () => {
+      fetchUnreadNotificationCount()
+        .then((res) => {
+          if (!cancelled) setCount(res.count);
+        })
+        .catch(() => {
+          if (!cancelled) setCount(0);
+        });
+    };
+
+    refresh();
+    if (!poll) {
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    const id = setInterval(refresh, POLL_MS);
     return () => {
       cancelled = true;
+      clearInterval(id);
     };
-  }, [refreshKey]);
+  }, [refreshKey, poll]);
 
   return (
     <TouchableOpacity onPress={onPress} style={styles.wrap} accessibilityLabel="Notifications">

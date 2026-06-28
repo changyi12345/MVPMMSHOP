@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { verifyEmail } from '@/lib/api/auth';
+import AuthBrandLogo from '@/components/AuthBrandLogo';
 import { useLang } from '@/lib/useLang';
 import PageMeta from '@/components/PageMeta';
 
@@ -35,7 +36,7 @@ function VerifyForm() {
   return (
     <div className="auth-page">
       <div className="auth-card" style={{ textAlign: 'center' }}>
-        <div className="auth-logo">MVPMMSHOP</div>
+        <AuthBrandLogo />
         <h2 className="auth-title">{t('verifyEmail')}</h2>
         {status === 'loading' && <p>{t('loading')}</p>}
         {status === 'ok' && (

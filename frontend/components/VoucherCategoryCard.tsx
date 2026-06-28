@@ -8,20 +8,24 @@ import { useLang } from '@/lib/useLang';
 interface VoucherCategoryCardProps {
   category: VoucherCategory;
   compact?: boolean;
+  home?: boolean;
 }
 
-export default function VoucherCategoryCard({ category, compact }: VoucherCategoryCardProps) {
+export default function VoucherCategoryCard({ category, compact, home }: VoucherCategoryCardProps) {
   const { t } = useLang();
 
   return (
-    <Link href={`/vouchers/category/${category.id}`} className="game-card">
+    <Link
+      href={`/vouchers/category/${category.id}`}
+      className={`game-card${compact ? ' game-card--compact' : ''}${home ? ' game-card--home' : ''}`}
+    >
       <div className={`game-card-image-wrap ${compact ? 'compact' : ''}`}>
         {category.imageUrl ? (
           <Image
             src={category.imageUrl}
             alt={category.title}
-            width={compact ? 80 : 120}
-            height={compact ? 80 : 120}
+            width={compact ? 72 : 120}
+            height={compact ? 72 : 120}
             className="game-card-image"
             unoptimized
           />
@@ -30,6 +34,9 @@ export default function VoucherCategoryCard({ category, compact }: VoucherCatego
         )}
       </div>
       <div className="game-card-name">{category.title}</div>
+      {home && compact && (
+        <span className="game-card-home-action">{t('browseCards')}</span>
+      )}
       {!compact && (
         <div className="game-card-type">{category.productCount} products</div>
       )}

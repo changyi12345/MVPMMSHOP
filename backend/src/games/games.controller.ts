@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { ValidatePlayerDto } from './dto/validate-player.dto';
 
@@ -9,6 +9,12 @@ export class GamesController {
   @Get()
   findAll() {
     return this.gamesService.findAll();
+  }
+
+  @Get('popular')
+  findPopular(@Query('limit') limit?: string) {
+    const parsed = Number.parseInt(limit ?? '12', 10);
+    return this.gamesService.findPopular(Number.isFinite(parsed) ? parsed : 12);
   }
 
   @Get(':code')

@@ -28,3 +28,10 @@ export function fetchProfile() {
 export function fetchReferralStats() {
   return apiFetch<ReferralStats>('/referral');
 }
+
+export function changePassword(data: { currentPassword: string; newPassword: string }) {
+  return apiFetch<{ message: string }>('/auth/change-password', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}

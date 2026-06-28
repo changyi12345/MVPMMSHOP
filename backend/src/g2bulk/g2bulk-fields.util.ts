@@ -60,6 +60,24 @@ export function buildValidatePayload(
   return body;
 }
 
+/** G2Bulk POST /v1/games/:code/order body (see G2BULK_API_ANALYSIS.md) */
+export function buildOrderPayload(params: {
+  catalogue_name: string;
+  catalogue_id?: number;
+  playerId?: string | null;
+  serverId?: string | null;
+  charname?: string | null;
+}): Record<string, string | number> {
+  const body: Record<string, string | number> = {
+    catalogue_name: params.catalogue_name,
+  };
+  if (params.catalogue_id != null) body.catalogue_id = params.catalogue_id;
+  if (params.playerId?.trim()) body.player_id = params.playerId.trim();
+  if (params.serverId?.trim()) body.server_id = params.serverId.trim();
+  if (params.charname?.trim()) body.charname = params.charname.trim();
+  return body;
+}
+
 export function buildFieldDefinitions(
   apiFields: string[],
   servers: Record<string, string> | null,

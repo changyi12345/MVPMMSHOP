@@ -475,6 +475,12 @@ export function refundOrder(orderId: number, reason?: string) {
   });
 }
 
+export function retryFulfillment(orderId: number) {
+  return apiFetch<{ order: AdminOrderDetail }>(`/admin/orders/${orderId}/retry-fulfillment`, {
+    method: 'POST',
+  });
+}
+
 export function fetch2faStatus() {
   return apiFetch<{ enabled: boolean }>('/admin/2fa/status');
 }

@@ -171,9 +171,9 @@ const styles = StyleSheet.create({
   outOfStock: { color: colors.red },
   desc: { color: colors.darkGray, fontSize: 14, marginBottom: spacing.md, lineHeight: 20 },
   qtyRow: { marginBottom: spacing.md },
-  qtyLabel: { color: colors.white, fontWeight: '600', marginBottom: spacing.sm },
+  qtyLabel: { color: colors.text, fontWeight: '600', marginBottom: spacing.sm },
   qtyControls: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  qtyValue: { color: colors.white, fontSize: 20, fontWeight: '700', minWidth: 32, textAlign: 'center' },
-  total: { color: colors.white, fontWeight: '700', fontSize: 18, marginBottom: spacing.lg },
+  qtyValue: { color: colors.text, fontSize: 20, fontWeight: '700', minWidth: 32, textAlign: 'center' },
+  total: { color: colors.text, fontWeight: '700', fontSize: 18, marginBottom: spacing.lg },
   actions: { gap: spacing.sm },
 });

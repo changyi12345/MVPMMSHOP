@@ -1,11 +1,11 @@
 import { StyleSheet } from 'react-native';
-import { colors, spacing, radius } from './colors';
+import { colors, spacing, radius, shadows } from './colors';
 
 /** Shared layout + component styles aligned with web globals.css */
 export const screen = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: colors.black,
+    backgroundColor: colors.background,
   },
   content: {
     padding: spacing.md,
@@ -20,7 +20,7 @@ export const screen = StyleSheet.create({
     paddingBottom: spacing.sm,
     backgroundColor: colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: colors.surfaceAlt,
+    borderBottomColor: colors.border,
   },
   backLink: {
     color: colors.cyan,
@@ -29,7 +29,7 @@ export const screen = StyleSheet.create({
   },
   headerTitle: {
     flex: 1,
-    color: colors.white,
+    color: colors.text,
     fontSize: 20,
     fontWeight: '700',
   },
@@ -39,7 +39,8 @@ export const screen = StyleSheet.create({
     padding: spacing.md,
     marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: colors.surfaceAlt,
+    borderColor: colors.border,
+    ...shadows.sm,
   },
   heroCard: {
     backgroundColor: colors.violetDark,
@@ -51,28 +52,28 @@ export const screen = StyleSheet.create({
     borderColor: 'rgba(6,182,212,0.25)',
   },
   sectionTitle: {
-    color: colors.white,
+    color: colors.text,
     fontSize: 16,
     fontWeight: '700',
     marginBottom: spacing.md,
   },
   label: {
-    color: colors.darkGray,
+    color: colors.textMuted,
     fontSize: 14,
     marginBottom: spacing.xs,
   },
   labelLight: {
-    color: colors.white,
+    color: colors.text,
     fontSize: 14,
     fontWeight: '500',
     marginBottom: spacing.sm,
   },
   bodyText: {
-    color: colors.white,
+    color: colors.text,
     fontSize: 15,
   },
   metaText: {
-    color: colors.darkGray,
+    color: colors.textMuted,
     fontSize: 13,
   },
   price: {
@@ -80,35 +81,35 @@ export const screen = StyleSheet.create({
     fontWeight: '700',
   },
   priceLarge: {
-    color: colors.white,
+    color: colors.text,
     fontSize: 32,
     fontWeight: '800',
   },
   input: {
-    backgroundColor: colors.black,
-    color: colors.white,
+    backgroundColor: colors.surface,
+    color: colors.text,
     borderRadius: radius.md,
     padding: spacing.md,
     fontSize: 15,
     borderWidth: 1,
-    borderColor: colors.surfaceAlt,
+    borderColor: colors.border,
     marginBottom: spacing.sm,
   },
   searchInput: {
     backgroundColor: colors.surface,
-    color: colors.white,
+    color: colors.text,
     borderRadius: radius.md,
     padding: spacing.md,
     fontSize: 15,
     borderWidth: 1,
-    borderColor: colors.surfaceAlt,
+    borderColor: colors.border,
     marginBottom: spacing.lg,
   },
   footer: {
     backgroundColor: colors.surface,
     padding: spacing.md,
     borderTopWidth: 1,
-    borderTopColor: colors.surfaceAlt,
+    borderTopColor: colors.border,
   },
   rowCard: {
     flexDirection: 'row',
@@ -117,10 +118,10 @@ export const screen = StyleSheet.create({
     padding: spacing.md,
     marginBottom: spacing.sm,
     borderWidth: 1,
-    borderColor: colors.surfaceAlt,
+    borderColor: colors.border,
   },
   emptyText: {
-    color: colors.darkGray,
+    color: colors.textMuted,
     textAlign: 'center',
     marginTop: spacing.xl,
   },
@@ -129,7 +130,7 @@ export const screen = StyleSheet.create({
 export const select = StyleSheet.create({
   option: {
     borderWidth: 2,
-    borderColor: colors.surfaceAlt,
+    borderColor: colors.border,
     borderRadius: radius.sm,
     padding: spacing.md,
     marginBottom: spacing.sm,
@@ -137,7 +138,7 @@ export const select = StyleSheet.create({
   },
   optionActive: {
     borderColor: colors.violet,
-    backgroundColor: 'rgba(99,102,241,0.12)',
+    backgroundColor: 'rgba(99,102,241,0.08)',
   },
   optionDisabled: {
     opacity: 0.45,
@@ -150,7 +151,7 @@ export const chip = StyleSheet.create({
     paddingVertical: spacing.sm,
     borderRadius: radius.pill,
     borderWidth: 1,
-    borderColor: colors.surfaceAlt,
+    borderColor: colors.border,
     marginRight: spacing.sm,
     backgroundColor: colors.surface,
   },
@@ -160,10 +161,10 @@ export const chip = StyleSheet.create({
   },
   text: {
     fontSize: 13,
-    color: colors.darkGray,
+    color: colors.textMuted,
   },
   textActive: {
-    color: colors.cyan,
+    color: colors.white,
     fontWeight: '600',
   },
 });
@@ -172,7 +173,7 @@ export const packageStyles = StyleSheet.create({
   item: {
     width: '47%',
     borderWidth: 2,
-    borderColor: colors.surfaceAlt,
+    borderColor: colors.border,
     borderRadius: radius.sm,
     padding: spacing.md,
     alignItems: 'center',
@@ -180,13 +181,13 @@ export const packageStyles = StyleSheet.create({
   },
   selected: {
     borderColor: colors.cyan,
-    backgroundColor: 'rgba(6,182,212,0.1)',
+    backgroundColor: 'rgba(6,182,212,0.08)',
   },
   name: {
     fontWeight: '600',
     marginBottom: 4,
     textAlign: 'center',
-    color: colors.white,
+    color: colors.text,
   },
   price: {
     color: colors.cyan,

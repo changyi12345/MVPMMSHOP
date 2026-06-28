@@ -1,9 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { useShop } from '@/components/ShopProvider';
-import { resolveMediaUrl } from '@/lib/media-url';
+import BrandLogo from '@/components/BrandLogo';
 import { useLang } from '@/lib/useLang';
 import { useAuthUser } from '@/lib/use-auth';
 
@@ -13,7 +12,6 @@ export default function Footer() {
   const { t } = useLang();
   const shopName = shop?.shopName ?? 'MVPMMSHOP';
   const tagline = shop?.shopTagline ?? (t('heroDefaultSubtitle'));
-  const logoSrc = resolveMediaUrl(shop?.logoUrl ?? null);
   const telegram = shop?.supportTelegram;
   const liveChat = shop?.liveChatUrl;
   const flags = shop?.featureFlags;
@@ -25,11 +23,7 @@ export default function Footer() {
       <div className="container">
         <div className="footer-grid">
           <div>
-            {logoSrc ? (
-              <Image src={logoSrc} alt={shopName} width={140} height={40} unoptimized className="footer-logo" />
-            ) : (
-              <div className="footer-title">{shopName}</div>
-            )}
+            <BrandLogo shopLogoUrl={shop?.logoUrl} shopName={shopName} className="footer-logo" />
             <p style={{ opacity: 0.8, fontSize: 14, marginTop: 12 }}>{tagline}</p>
             {(phone || email) && (
               <p style={{ opacity: 0.75, fontSize: 13, marginTop: 8 }}>

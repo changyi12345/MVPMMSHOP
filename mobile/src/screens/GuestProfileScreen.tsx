@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import AppHeader from '../components/AppHeader';
+import MainHeader from '../components/MainHeader';
 import Button from '../components/Button';
 import { colors, spacing, radius } from '../theme/colors';
 import { screen } from '../theme/screenStyles';
@@ -28,7 +28,7 @@ export default function GuestProfileScreen({
 }: Props) {
   return (
     <View style={screen.root}>
-      <AppHeader title={t('profile')} />
+      <MainHeader />
       <ScrollView contentContainerStyle={[screen.content, styles.scroll]}>
         <View style={styles.hero}>
           <Text style={styles.heroTitle}>{t('guestWelcome')}</Text>
@@ -66,10 +66,10 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     marginBottom: spacing.lg,
     borderWidth: 1,
-    borderColor: colors.surfaceAlt,
+    borderColor: colors.borderBrand,
   },
-  heroTitle: { color: colors.white, fontSize: 20, fontWeight: '700', marginBottom: spacing.sm },
-  heroSub: { color: colors.darkGray, marginBottom: spacing.lg, lineHeight: 20 },
+  heroTitle: { color: colors.textTitle, fontSize: 20, fontWeight: '700', marginBottom: spacing.sm },
+  heroSub: { color: colors.textMuted, marginBottom: spacing.lg, lineHeight: 20 },
   linkRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -79,8 +79,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     marginBottom: spacing.sm,
     borderWidth: 1,
-    borderColor: colors.surfaceAlt,
+    borderColor: colors.border,
   },
-  linkText: { color: colors.white, fontSize: 15, fontWeight: '500' },
-  chevron: { color: colors.cyan, fontSize: 16 },
+  linkText: { color: colors.text, fontSize: 15, fontWeight: '500' },
+  chevron: { color: colors.cyanDark, fontSize: 16 },
 });

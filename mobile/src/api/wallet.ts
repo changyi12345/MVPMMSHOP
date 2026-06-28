@@ -17,10 +17,15 @@ export function fetchWallet() {
   return apiFetch<WalletData>('/wallet');
 }
 
-export function requestTopUp(amount: number, paymentMethod: string, reference?: string) {
+export function requestTopUp(
+  amount: number,
+  paymentMethod: string,
+  reference?: string,
+  proofImageUrl?: string,
+) {
   return apiFetch<{ id: number; status: string; amount: number; message: string }>('/wallet/topup', {
     method: 'POST',
-    body: JSON.stringify({ amount, paymentMethod, reference }),
+    body: JSON.stringify({ amount, paymentMethod, reference, proofImageUrl }),
   });
 }
 

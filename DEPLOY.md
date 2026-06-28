@@ -1,7 +1,7 @@
 # MVPMMSHOP Production Deployment Guide
 
-> **cPanel hosting (50k/105k plan):** see **`deploy/CPANEL.md`**  
-> **rankage.shop VPS:** see **`deploy/RANKAGE.md`**
+> **VPS (recommended):** see **`deploy/VPS-SETUP-MM.md`** (step-by-step) or **`deploy/RANKAGE.md`**  
+> **cPanel hosting (50k/105k plan):** see **`deploy/CPANEL.md`**
 
 ## Domain layout (rankage.shop)
 
@@ -88,6 +88,20 @@ server {
   ssl_certificate_key /etc/letsencrypt/live/rankage.shop/privkey.pem;
 
   client_max_body_size 5m;
+
+  location = /uploads/payment-proof {
+    proxy_pass http://127.0.0.1:4000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    client_max_body_size 5m;
+  }
+
+  location = /uploads/payment-proof-base64 {
+    proxy_pass http://127.0.0.1:4000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    client_max_body_size 5m;
+  }
 
   location /uploads/ {
     alias /var/www/mvpmms/backend/uploads/;

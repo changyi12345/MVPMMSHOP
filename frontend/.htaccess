@@ -1,0 +1,15 @@
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+PassengerAppRoot "/home/ztkopszw/public_html/rankage.shop"
+PassengerBaseURI "/"
+PassengerNodejs "/home/ztkopszw/nodevenv/public_html/rankage.shop/20/bin/node"
+PassengerAppType node
+PassengerStartupFile server.js
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+# DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION BEGIN
+<IfModule Litespeed>
+SetEnv NODE_ENV production
+SetEnv NEXT_PUBLIC_API_URL https://api.rankage.shop
+SetEnv NEXT_PUBLIC_GOOGLE_CLIENT_ID 1043403458086-fa28d81odsntn6touqttjlqhltdo8tvp.apps.googleusercontent.com
+SetEnv NEXT_PUBLIC_VAPID_PUBLIC_KEY BO_MRGGnaSFoMxZre-vhViH0OJsGnE8srizAk2mQPn6pIJyn1_Gwz_UTRkr5HX4HIViDDytqf-8ky1RHEShLJPY
+</IfModule>
+# DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION END

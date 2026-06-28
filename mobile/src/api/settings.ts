@@ -10,6 +10,9 @@ export interface PaymentAccount {
 
 export interface ShopInfo {
   shopName: string;
+  logoUrl?: string | null;
+  faviconUrl?: string | null;
+  shopTagline?: string | null;
   paymentMethods: string[];
   paymentAccounts: PaymentAccount[];
   minWalletTopup: number;

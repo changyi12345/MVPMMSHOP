@@ -153,6 +153,45 @@ export async function fetchGames(): Promise<ApiGame[]> {
   return fetchGamesFromG2Bulk();
 }
 
+export async function fetchPopularGames(limit = 12): Promise<ApiGame[]> {
+  return fetchPopularGamesCached(limit);
+}
+
+let popularGamesInflight: Promise<ApiGame[]> | null = null;
+let popularGamesCache: { key: string; data: ApiGame[]; ts: number } | null = null;
+const POPULAR_GAMES_CLIENT_TTL_MS = 60_000;
+
+async function fetchPopularGamesCached(limit = 12): Promise<ApiGame[]> {
+  const key = String(limit);
+  const now = Date.now();
+  if (popularGamesCache?.key === key && now - popularGamesCache.ts < POPULAR_GAMES_CLIENT_TTL_MS) {
+    return popularGamesCache.data;
+  }
+  if (popularGamesInflight) return popularGamesInflight;
+
+  popularGamesInflight = (async () => {
+    try {
+      const res = await fetch(`${API_BASE}/games/popular?limit=${limit}`, { cache: 'no-store' });
+      if (res.ok) {
+        const data = (await res.json()) as Record<string, unknown>[];
+        const normalized = data.map(normalizeGame);
+        popularGamesCache = { key, data: normalized, ts: Date.now() };
+        return normalized;
+      }
+    } catch {
+      // Backend unavailable
+    }
+    const all = await fetchGames();
+    const fallback = all.slice(0, limit);
+    popularGamesCache = { key, data: fallback, ts: Date.now() };
+    return fallback;
+  })().finally(() => {
+    popularGamesInflight = null;
+  });
+
+  return popularGamesInflight;
+}
+
 export async function fetchGame(code: string): Promise<ApiGameDetail> {
   try {
     const res = await fetch(`${API_BASE}/games/${encodeURIComponent(code)}`, {

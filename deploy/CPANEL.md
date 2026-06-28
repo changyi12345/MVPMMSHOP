@@ -123,17 +123,19 @@ NEXT_PUBLIC_API_URL=https://api.rankage.shop
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=1043403458086-....apps.googleusercontent.com
 ```
 
-**Terminal:**
+**Deploy (recommended):** PC မှာ `deploy/prepare-prod-zips.ps1` run → `deploy-web.zip` upload/extract (`.next` included).
+
+**Terminal (server — install only, NO build):**
 
 ```bash
-source /home/USER/nodevenv/mvpmms/frontend/18/bin/activate
-cd ~/mvpmms/frontend
-npm ci
-npm run build
-npm prune --omit=dev
+source /home/USER/nodevenv/public_html/rankage.shop/20/bin/activate
+cd ~/public_html/rankage.shop
+npm install --omit=dev
 ```
 
-Restart Node.js app → **Test:** `https://rankage.shop`
+> **`npm run build` server မှာ မလုပ်ပါနဲ့** — zip ထဲ `app/` မပါ။ Build error: *Couldn't find any pages or app directory*.
+
+cPanel → **Restart** Node.js app → **Test:** `https://rankage.shop`
 
 ---
 
@@ -196,6 +198,7 @@ npm run build
 | Problem | Fix |
 |---------|-----|
 | 503 Service Unavailable | Node.js app Restart; startup file = `server.js`; build completed? |
+| FileNotFoundError `.htaccess` | `touch public_html/rankage.shop/.htaccess` (+ API folder); then Restart |
 | CORS error | Backend env `CORS_ORIGINS` မှာ `https://rankage.shop` ပါမပါ |
 | API 404 on frontend | `NEXT_PUBLIC_API_URL=https://api.rankage.shop` + frontend rebuild |
 | Prisma error | `npx prisma generate && npx prisma db push` |

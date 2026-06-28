@@ -1,5 +1,6 @@
 import { Platform } from 'react-native';
-import { registerFcmToken } from '../api/push';
+import { registerFcmToken, unregisterFcmToken } from '../api/push';
+import { requestNotificationPermission } from './permissions';
 
 let cachedToken: string | null = null;
 
@@ -8,6 +9,10 @@ let cachedToken: string | null = null;
  * See mobile/docs/FCM_SETUP.md for google-services.json setup.
  */
 export async function initPushNotifications(): Promise<void> {
+  if (Platform.OS === 'android') {
+    await requestNotificationPermission();
+  }
+
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const messaging = require('@react-native-firebase/messaging').default as {
@@ -32,5 +37,16 @@ export async function initPushNotifications(): Promise<void> {
     });
   } catch {
     // Firebase not linked — inbox notifications still work via API polling
+  }
+}
+
+export async function teardownPushNotifications(): Promise<void> {
+  if (!cachedToken) return;
+  const token = cachedToken;
+  cachedToken = null;
+  try {
+    await unregisterFcmToken(token);
+  } catch {
+    // ignore
   }
 }

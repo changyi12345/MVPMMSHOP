@@ -15,10 +15,11 @@ import { colors, spacing, radius } from '../theme/colors';
 import StatusBadge from '../components/StatusBadge';
 import Button from '../components/Button';
 import { fetchMyOrders, formatOrderId, submitPaymentProof, cancelOrder, canCancelOrder } from '../api/orders';
-import { uploadPaymentProofUri } from '../api/upload';
-import { pickPaymentProofImage } from '../utils/pick-image';
+import { uploadPaymentProof } from '../api/upload';
+import { PickedImage } from '../utils/pick-image';
+import PaymentProofPicker from '../components/PaymentProofPicker';
 import { screen } from '../theme/screenStyles';
-import AppHeader from '../components/AppHeader';
+import MainHeader from '../components/MainHeader';
 import { subscribeLang, t } from '../i18n';
 
 interface Props {
@@ -46,7 +47,7 @@ export default function OrdersScreen({
   const [loading, setLoading] = useState(true);
   const [uploadOrder, setUploadOrder] = useState<OrderRow | null>(null);
   const [reference, setReference] = useState('');
-  const [proofUri, setProofUri] = useState<string | null>(null);
+  const [proof, setProof] = useState<PickedImage | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const [, langBump] = useState(0);
@@ -77,21 +78,20 @@ export default function OrdersScreen({
 
   useEffect(() => { load(); }, []);
 
-  const pickImage = async () => {
-    const picked = await pickPaymentProofImage();
-    if (picked) setProofUri(picked.uri);
-  };
-
   const handleSubmitProof = async () => {
     if (!uploadOrder) return;
     setSubmitting(true);
     try {
       let imageUrl: string | undefined;
-      if (proofUri) {
+      if (proof) {
         try {
-          imageUrl = await uploadPaymentProofUri(proofUri);
-        } catch {
-          // reference-only fallback
+          imageUrl = await uploadPaymentProof(proof);
+        } catch (uploadErr) {
+          Alert.alert(
+            t('uploadProofFailed'),
+            uploadErr instanceof Error ? uploadErr.message : t('requestFailed'),
+          );
+          return;
         }
       }
       await submitPaymentProof(uploadOrder.numericId, {
@@ -101,7 +101,7 @@ export default function OrdersScreen({
       });
       setUploadOrder(null);
       setReference('');
-      setProofUri(null);
+      setProof(null);
       load();
       Alert.alert('Success', 'Payment proof submitted! Awaiting verification.');
     } catch (err) {
@@ -131,8 +131,7 @@ export default function OrdersScreen({
 
   return (
     <View style={screen.root}>
-      <AppHeader
-        title={`📦 ${t('orders')}`}
+      <MainHeader
         onNotificationsPress={onNotificationsPress}
         notificationRefreshKey={notificationRefreshKey}
         onLangChange={() => langBump((n) => n + 1)}
@@ -165,7 +164,7 @@ export default function OrdersScreen({
                         onPress={() => {
                           setUploadOrder(order);
                           setReference('');
-                          setProofUri(null);
+                          setProof(null);
                         }}
                       />
                     )}
@@ -184,9 +183,7 @@ export default function OrdersScreen({
         <View style={styles.modalBackdrop}>
           <View style={styles.modal}>
             <Text style={styles.modalTitle}>Payment Proof — {uploadOrder?.id}</Text>
-            <TouchableOpacity style={styles.uploadZone} onPress={pickImage}>
-              <Text style={styles.modalBody}>{proofUri ? '📷 Photo selected' : 'Choose screenshot'}</Text>
-            </TouchableOpacity>
+            <PaymentProofPicker value={proof} onChange={setProof} uploading={submitting} />
             <TextInput
               style={screen.input}
               placeholder="Transaction reference"
@@ -208,9 +205,9 @@ export default function OrdersScreen({
 const styles = StyleSheet.create({
   card: { marginBottom: spacing.sm },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
-  orderId: { fontSize: 16, fontWeight: '700', color: colors.white },
+  orderId: { fontSize: 16, fontWeight: '700', color: colors.text },
   date: { color: colors.darkGray, fontSize: 13, marginVertical: 4 },
-  items: { marginBottom: 8, color: colors.white },
+  items: { marginBottom: 8, color: colors.text },
   total: { fontWeight: '700', color: colors.cyan },
   actions: { flexDirection: 'row', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end', flex: 1 },
   empty: { alignItems: 'center', paddingTop: 48 },
@@ -225,16 +222,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderColor: colors.surfaceAlt,
   },
-  modalTitle: { fontSize: 18, fontWeight: '700', marginBottom: spacing.md, color: colors.white },
-  modalBody: { color: colors.white },
-  uploadZone: {
-    borderWidth: 2,
-    borderStyle: 'dashed',
-    borderColor: colors.violetLight,
-    borderRadius: radius.md,
-    padding: spacing.lg,
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  modalActions: { flexDirection: 'row', gap: spacing.sm, justifyContent: 'flex-end' },
+  modalTitle: { fontSize: 18, fontWeight: '700', marginBottom: spacing.md, color: colors.text },
+  modalActions: { flexDirection: 'row', gap: spacing.sm, justifyContent: 'flex-end', marginTop: spacing.md },
 });

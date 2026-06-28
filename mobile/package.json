@@ -10,14 +10,17 @@
     "ios": "react-native run-ios",
     "test": "jest",
     "build:android:release": "powershell -ExecutionPolicy Bypass -File ./scripts/build-release.ps1",
-    "build:android:aab": "powershell -ExecutionPolicy Bypass -File ./scripts/build-release.ps1 -Target aab"
+    "install:android:release": "powershell -ExecutionPolicy Bypass -File ./scripts/install-release.ps1",
+    "build:android:aab": "powershell -ExecutionPolicy Bypass -File ./scripts/build-release.ps1 -Target aab",
+    "sync:icons": "powershell -ExecutionPolicy Bypass -File ./scripts/sync-icons.ps1"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-google-signin/google-signin": "^16.1.2",
     "react": "18.2.0",
     "react-native": "0.73.0",
-    "react-native-image-picker": "^7.1.2"
+    "react-native-image-picker": "^7.1.2",
+    "react-native-vector-icons": "^10.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

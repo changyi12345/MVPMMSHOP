@@ -14,6 +14,7 @@ import {
   updateOrderStatus,
   rejectPayment,
   refundOrder,
+  retryFulfillment,
   AdminOrder,
   AdminOrderDetail,
 } from '@/lib/api/admin';
@@ -34,6 +35,7 @@ export default function AdminOrders() {
   const [statusOrder, setStatusOrder] = useState<AdminOrder | null>(null);
   const [detailOrder, setDetailOrder] = useState<AdminOrderDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [retrying, setRetrying] = useState(false);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL');
   const [search, setSearch] = useState('');
   const { showToast } = useToast();
@@ -119,6 +121,26 @@ export default function AdminOrders() {
       await reload();
     } catch (err) {
       showToast(err instanceof Error ? err.message : 'Refund failed', 'error');
+    }
+  };
+
+  const handleDetailRetry = async () => {
+    if (!detailOrder) return;
+    if (!window.confirm(`Retry G2Bulk top-up for ${formatOrderId(detailOrder.id)}?`)) return;
+    setRetrying(true);
+    try {
+      const result = await retryFulfillment(detailOrder.id);
+      const status = result.order.status;
+      showToast(
+        status === 'COMPLETED' ? 'Top-up completed' : `Retry finished — status: ${status}`,
+        status === 'COMPLETED' ? 'success' : 'warning',
+      );
+      setDetailOrder(result.order);
+      await reload();
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Retry failed', 'error');
+    } finally {
+      setRetrying(false);
     }
   };
 
@@ -254,6 +276,8 @@ export default function AdminOrders() {
         onVerify={detailOrder ? handleDetailVerify : undefined}
         onReject={detailOrder ? handleDetailReject : undefined}
         onRefund={detailOrder ? handleDetailRefund : undefined}
+        onRetry={detailOrder?.status === 'PROCESSING' ? handleDetailRetry : undefined}
+        retrying={retrying}
       />
 
       <OrderStatusModal

@@ -47,11 +47,13 @@ export class TwoFactorService {
       throw new BadRequestException('2FA is already enabled. Disable it first to reconfigure.');
     }
 
-    const secret = generateSecret();
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { totpSecret: secret, totpEnabled: false, totpBackupHashes: [] },
-    });
+    const secret = user.totpSecret ?? generateSecret();
+    if (!user.totpSecret) {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { totpSecret: secret, totpEnabled: false, totpBackupHashes: [] },
+      });
+    }
 
     const otpauthUrl = generateURI({
       issuer: shopName,

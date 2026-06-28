@@ -6,6 +6,7 @@ import { Suspense, useState } from 'react';
 import { is2FALogin, loginUser, saveAuth } from '@/lib/api/auth';
 import { trackLogin } from '@/lib/analytics';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
+import AuthBrandLogo from '@/components/AuthBrandLogo';
 import { useToast } from '@/components/Toast';
 import { useLang } from '@/lib/useLang';
 
@@ -46,7 +47,7 @@ function LoginForm() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <div className="auth-logo">MVPMMSHOP</div>
+        <AuthBrandLogo />
         <h2 className="auth-title">{t('login')}</h2>
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-group">

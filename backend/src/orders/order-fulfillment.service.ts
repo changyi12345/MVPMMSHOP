@@ -39,11 +39,11 @@ export class OrderFulfillmentService {
         }
 
         const input = order.topUpInput;
-        const result = await this.g2bulk.placeGameOrder({
-          game: order.product.g2bulkGameCode,
+        const result = await this.g2bulk.placeGameOrder(order.product.g2bulkGameCode, {
           catalogue_name: catalogueName,
-          userid: input?.playerId,
-          ...(input?.serverId ? { serverid: input.serverId } : {}),
+          playerId: input?.playerId,
+          serverId: input?.serverId,
+          charname: input?.playerName,
         });
 
         if (result.success) {

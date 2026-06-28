@@ -12,6 +12,11 @@ New-Item -ItemType Directory -Force -Path $work | Out-Null
 Write-Host "Work dir: $work" -ForegroundColor Cyan
 
 Copy-Item (Join-Path $root 'backend\prisma') (Join-Path $work 'prisma') -Recurse -Force
+# Linux engines for cPanel (Windows zip alone breaks on server — no .dll on Linux)
+$schemaPath = Join-Path $work 'prisma\schema.prisma'
+$schema = Get-Content $schemaPath -Raw
+$schema = $schema -replace 'binaryTargets\s*=\s*\[[^\]]*\]', 'binaryTargets = ["rhel-openssl-3.0.x", "debian-openssl-3.0.x", "debian-openssl-1.1.x"]'
+Set-Content -Path $schemaPath -Value $schema -NoNewline
 $pkgJson = Join-Path $work 'package.json'
 [System.IO.File]::WriteAllText($pkgJson, '{"name":"prisma-gen","private":true,"dependencies":{"@prisma/client":"5.22.0","prisma":"5.22.0"}}')
 
@@ -48,9 +53,10 @@ try {
   Write-Host ''
   Write-Host 'Done.' -ForegroundColor Green
   Write-Host "  Zip: $prismaZip"
-  Write-Host '  Server:'
-  Write-Host '    cd ~/nodevenv/api.rankage.shop/20/lib/node_modules'
+  Write-Host '  Server (after npm install in api.rankage.shop):'
+  Write-Host '    cd ~/api.rankage.shop/node_modules'
   Write-Host '    unzip -o ~/api.rankage.shop/prisma-cpanel.zip'
+  Write-Host '  Or skip zip if: npx prisma generate works on server (preferred).'
 } finally {
   Pop-Location
   Remove-Item $work -Recurse -Force -ErrorAction SilentlyContinue

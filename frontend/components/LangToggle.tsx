@@ -3,7 +3,11 @@
 import { getLang, setLang, Lang } from '@/lib/i18n';
 import { useEffect, useState } from 'react';
 
-export default function LangToggle() {
+type Props = {
+  compact?: boolean;
+};
+
+export default function LangToggle({ compact = false }: Props) {
   const [lang, setLangState] = useState<Lang>('en');
 
   useEffect(() => {
@@ -22,12 +26,17 @@ export default function LangToggle() {
   return (
     <button
       type="button"
-      className="lang-toggle"
+      className={`lang-toggle header-icon-btn${compact ? ' lang-toggle--compact' : ''}`}
       onClick={toggle}
       aria-label="Toggle language"
       title={lang === 'en' ? 'Switch to Myanmar' : 'Switch to English'}
     >
-      {lang === 'en' ? '🇲🇲 MM' : '🇬🇧 EN'}
+      {!compact && (
+        <span className="lang-toggle-full">{lang === 'en' ? '🇲🇲 MM' : '🇬🇧 EN'}</span>
+      )}
+      {compact ? (
+        <span className="lang-toggle-short">{lang === 'en' ? 'MM' : 'EN'}</span>
+      ) : null}
     </button>
   );
 }

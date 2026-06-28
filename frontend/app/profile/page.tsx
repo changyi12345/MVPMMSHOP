@@ -10,7 +10,7 @@ import { formatPrice } from '@/lib/format-price';
 import { useLang } from '@/lib/useLang';
 import { useAuthUser } from '@/lib/use-auth';
 import { useWallet } from '@/lib/use-wallet';
-import { enableWebPush } from '@/lib/api/push';
+import { enableWebPush, disableWebPush } from '@/lib/api/push';
 import { useToast } from '@/components/Toast';
 import { useShop } from '@/components/ShopProvider';
 import { DEFAULT_FEATURE_FLAGS } from '@/lib/feature-flags';
@@ -41,6 +41,17 @@ export default function ProfilePage() {
   const [otpSent, setOtpSent] = useState(false);
   const [sendingOtp, setSendingOtp] = useState(false);
   const [verifyingOtp, setVerifyingOtp] = useState(false);
+  const [pushEnabled, setPushEnabled] = useState(false);
+  const [pushBusy, setPushBusy] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return;
+    navigator.serviceWorker.getRegistration('/sw.js').then((reg) => {
+      reg?.pushManager.getSubscription().then((sub) => {
+        setPushEnabled(!!sub);
+      });
+    });
+  }, []);
 
   const flags = { ...DEFAULT_FEATURE_FLAGS, ...shop?.featureFlags };
   const smsOtpEnabled = flags.smsOtpEnabled;
@@ -272,19 +283,38 @@ export default function ProfilePage() {
             <button
               type="button"
               className="profile-menu-item"
+              disabled={pushBusy}
               onClick={async () => {
-                const result = await enableWebPush();
-                if (result === 'granted') showToast(t('pushEnabled'), 'success');
-                else if (result === 'unconfigured') showToast('Push not configured on server', 'error');
-                else showToast(t('pushDenied'), 'error');
+                setPushBusy(true);
+                try {
+                  if (pushEnabled) {
+                    await disableWebPush();
+                    setPushEnabled(false);
+                    showToast(t('pushDisabled'), 'success');
+                  } else {
+                    const result = await enableWebPush();
+                    if (result === 'granted') {
+                      setPushEnabled(true);
+                      showToast(t('pushEnabled'), 'success');
+                    } else if (result === 'unconfigured') {
+                      showToast('Push not configured on server', 'error');
+                    } else {
+                      showToast(t('pushDenied'), 'error');
+                    }
+                  }
+                } finally {
+                  setPushBusy(false);
+                }
               }}
             >
               <span className="profile-menu-icon">🔔</span>
               <span className="profile-menu-text">
                 <span className="profile-menu-label">{t('profileNotifications')}</span>
-                <span className="profile-menu-desc">{t('profileNotificationsDesc')}</span>
+                <span className="profile-menu-desc">
+                  {pushEnabled ? t('pushEnabledDesc') : t('profileNotificationsDesc')}
+                </span>
               </span>
-              <span className="profile-menu-chevron">›</span>
+              <span className="profile-menu-chevron">{pushEnabled ? '✓' : '›'}</span>
             </button>
             {accountItems.map((item) => (
               <Link key={item.label} href={item.href} className="profile-menu-item">

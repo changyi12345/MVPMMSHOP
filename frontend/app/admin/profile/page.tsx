@@ -44,12 +44,20 @@ export default function AdminProfilePage() {
 
   useEffect(() => {
     Promise.all([fetchProfile(), fetch2faStatus()])
-      .then(([user, tfa]) => {
+      .then(async ([user, tfa]) => {
         setUsername(user.username);
         setEmail(user.email);
         setRole(user.role);
         setTwoFaEnabled(tfa.enabled);
         refreshStoredUser(user);
+        if (!tfa.enabled) {
+          try {
+            const pending = await setup2fa();
+            setSetupData(pending);
+          } catch {
+            // setup not started yet — user can click Set up 2FA
+          }
+        }
       })
       .catch(() => showToast('Failed to load profile', 'error'))
       .finally(() => setLoading(false));

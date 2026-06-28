@@ -14,6 +14,8 @@ interface AdminOrderDetailModalProps {
   onVerify?: () => void;
   onReject?: () => void;
   onRefund?: () => void;
+  onRetry?: () => void;
+  retrying?: boolean;
 }
 
 export default function AdminOrderDetailModal({
@@ -23,6 +25,8 @@ export default function AdminOrderDetailModal({
   onVerify,
   onReject,
   onRefund,
+  onRetry,
+  retrying,
 }: AdminOrderDetailModalProps) {
   if (!order && !loading) return null;
 
@@ -112,6 +116,11 @@ export default function AdminOrderDetailModal({
               {(order.status === 'PENDING' || order.status === 'PAYMENT_PENDING') && onReject && (
                 <button type="button" className="btn btn-outline btn-sm" onClick={onReject}>
                   Reject Payment
+                </button>
+              )}
+              {order.status === 'PROCESSING' && onRetry && (
+                <button type="button" className="btn btn-secondary btn-sm" onClick={onRetry} disabled={retrying}>
+                  {retrying ? 'Retrying…' : 'Retry Top-Up'}
                 </button>
               )}
               {(['COMPLETED', 'PROCESSING', 'PAYMENT_PENDING'] as string[]).includes(order.status) && onRefund && (

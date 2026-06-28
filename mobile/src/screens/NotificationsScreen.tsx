@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,6 @@ import {
   RefreshControl,
 } from 'react-native';
 import { colors, spacing, radius } from '../theme/colors';
-import Button from '../components/Button';
 import {
   fetchUserNotifications,
   markAllNotificationsRead,
@@ -22,12 +21,14 @@ import { t } from '../i18n';
 interface Props {
   onBack: () => void;
   onRead?: () => void;
+  onNavigate?: (url: string) => void;
 }
 
-export default function NotificationsScreen({ onBack, onRead }: Props) {
+export default function NotificationsScreen({ onBack, onRead, onNavigate }: Props) {
   const [items, setItems] = useState<UserNotification[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [filter, setFilter] = useState<'all' | 'unread'>('all');
 
   const load = useCallback(async () => {
     const data = await fetchUserNotifications({ limit: 50 });
@@ -44,7 +45,7 @@ export default function NotificationsScreen({ onBack, onRead }: Props) {
     }
   }, [load]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     reload();
   }, [reload]);
 
@@ -56,6 +57,9 @@ export default function NotificationsScreen({ onBack, onRead }: Props) {
       );
       onRead?.();
     }
+    if (item.url && onNavigate) {
+      onNavigate(item.url);
+    }
   };
 
   const handleMarkAll = async () => {
@@ -65,6 +69,7 @@ export default function NotificationsScreen({ onBack, onRead }: Props) {
   };
 
   const unread = items.filter((n) => !n.read).length;
+  const displayItems = filter === 'unread' ? items.filter((n) => !n.read) : items;
 
   return (
     <View style={styles.container}>
@@ -82,6 +87,25 @@ export default function NotificationsScreen({ onBack, onRead }: Props) {
         )}
       </View>
 
+      <View style={styles.filterRow}>
+        <TouchableOpacity
+          style={[styles.chip, filter === 'all' && styles.chipActive]}
+          onPress={() => setFilter('all')}
+        >
+          <Text style={[styles.chipText, filter === 'all' && styles.chipTextActive]}>
+            {t('all')} ({items.length})
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.chip, filter === 'unread' && styles.chipActive]}
+          onPress={() => setFilter('unread')}
+        >
+          <Text style={[styles.chipText, filter === 'unread' && styles.chipTextActive]}>
+            {t('unread')} ({unread})
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       {loading ? (
         <ActivityIndicator color={colors.violet} style={{ marginTop: 32 }} />
       ) : (
@@ -89,17 +113,17 @@ export default function NotificationsScreen({ onBack, onRead }: Props) {
           contentContainerStyle={styles.content}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={reload} tintColor={colors.cyan} />}
         >
-          {items.length === 0 ? (
+          {displayItems.length === 0 ? (
             <View style={styles.empty}>
               <Text style={styles.emptyIcon}>🔔</Text>
               <Text style={styles.emptyText}>{t('noNotifications')}</Text>
             </View>
           ) : (
-            items.map((item) => (
+            displayItems.map((item) => (
               <TouchableOpacity
                 key={item.id}
                 style={[styles.card, !item.read && styles.unread]}
-                onPress={() => handleOpen(item)}
+                onPress={() => void handleOpen(item)}
               >
                 <Text style={styles.icon}>{notificationIcon(item.type)}</Text>
                 <View style={styles.body}>
@@ -129,8 +153,28 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.surfaceAlt,
   },
   back: { color: colors.cyan, fontSize: 16, width: 72 },
-  title: { color: colors.white, fontSize: 18, fontWeight: '700', flex: 1, textAlign: 'center' },
+  title: { color: colors.text, fontSize: 18, fontWeight: '700', flex: 1, textAlign: 'center' },
   markAll: { color: colors.violetLight, fontSize: 12, fontWeight: '600', width: 72, textAlign: 'right' },
+  filterRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.surfaceAlt,
+  },
+  chipActive: {
+    backgroundColor: 'rgba(6, 182, 212, 0.15)',
+    borderColor: colors.cyan,
+  },
+  chipText: { color: colors.darkGray, fontSize: 12, fontWeight: '600' },
+  chipTextActive: { color: colors.cyan },
   content: { padding: spacing.md, paddingBottom: spacing.xl },
   empty: { alignItems: 'center', paddingTop: 48 },
   emptyIcon: { fontSize: 48, marginBottom: spacing.sm },
@@ -147,7 +191,7 @@ const styles = StyleSheet.create({
   unread: { borderLeftWidth: 3, borderLeftColor: colors.cyan },
   icon: { fontSize: 24 },
   body: { flex: 1 },
-  cardTitle: { color: colors.white, fontWeight: '700', marginBottom: 4 },
+  cardTitle: { color: colors.text, fontWeight: '700', marginBottom: 4 },
   cardBody: { color: colors.darkGray, fontSize: 14, lineHeight: 20 },
   date: { color: colors.darkGray, fontSize: 11, marginTop: 6, opacity: 0.8 },
   dot: {

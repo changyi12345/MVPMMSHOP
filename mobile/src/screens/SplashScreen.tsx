@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { colors, spacing } from '../theme/colors';
+import LogoMarkRing from '../components/LogoMarkRing';
 
 interface Props {
   onFinish: () => void;
@@ -14,9 +15,8 @@ export default function SplashScreen({ onFinish }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.logo}>MVPMMSHOP</Text>
-      <Text style={styles.subtitle}>Game Top Up</Text>
-      <ActivityIndicator size="large" color={colors.cyan} style={styles.loader} />
+      <LogoMarkRing size={96} />
+      <ActivityIndicator size="large" color={colors.violet} style={styles.loader} />
     </View>
   );
 }
@@ -24,21 +24,9 @@ export default function SplashScreen({ onFinish }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.black,
+    backgroundColor: colors.backgroundTop,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  logo: {
-    fontSize: 36,
-    fontWeight: '700',
-    color: colors.violetLight,
-    marginBottom: spacing.sm,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.white,
-    opacity: 0.8,
-    marginBottom: spacing.xl,
-  },
-  loader: { marginTop: spacing.md },
+  loader: { marginTop: spacing.lg },
 });

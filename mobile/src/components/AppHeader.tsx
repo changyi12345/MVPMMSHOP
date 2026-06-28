@@ -11,6 +11,7 @@ interface Props {
   notificationRefreshKey?: number;
   onLangChange?: () => void;
   style?: ViewStyle;
+  light?: boolean;
 }
 
 export default function AppHeader({
@@ -20,9 +21,10 @@ export default function AppHeader({
   notificationRefreshKey,
   onLangChange,
   style,
+  light = true,
 }: Props) {
   return (
-    <View style={[styles.row, style]}>
+    <View style={[styles.row, light ? styles.rowLight : styles.rowDark, style]}>
       <View style={styles.left}>{left ?? (title ? <Text style={styles.title}>{title}</Text> : null)}</View>
       <View style={styles.actions}>
         <LangToggle onChange={onLangChange} />
@@ -40,13 +42,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.md,
-    paddingTop: spacing.lg,
+    paddingTop: spacing.sm,
     paddingBottom: spacing.sm,
+  },
+  rowLight: {
     backgroundColor: colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: colors.surfaceAlt,
+    borderBottomColor: colors.border,
+  },
+  rowDark: {
+    backgroundColor: colors.header,
   },
   left: { flex: 1 },
-  title: { color: colors.white, fontSize: 22, fontWeight: '800' },
+  title: { color: colors.textTitle, fontSize: 20, fontWeight: '800' },
   actions: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
 });

@@ -5,7 +5,8 @@ import { colors } from '../theme/colors';
 import { isMlbbUnified } from '../data/mlbb-regions';
 import { hydrateAuth, isLoggedIn, clearAuth, loadPersistedLang } from '../api/auth';
 import { getCartItemCount } from '../lib/cart-store';
-import { initPushNotifications } from '../lib/push';
+import { initPushNotifications, teardownPushNotifications } from '../lib/push';
+import { parseNotificationUrl } from '../lib/notification-navigation';
 import { setLang, t } from '../i18n';
 import HomeScreen from '../screens/HomeScreen';
 import GamesScreen from '../screens/GamesScreen';
@@ -30,6 +31,7 @@ import NotificationsScreen from '../screens/NotificationsScreen';
 import VouchersScreen from '../screens/VouchersScreen';
 import VoucherCategoryScreen from '../screens/VoucherCategoryScreen';
 import VoucherDetailScreen from '../screens/VoucherDetailScreen';
+import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import SplashScreen from '../screens/SplashScreen';
 
 type AuthScreen = 'login' | 'register' | 'forgot-password';
@@ -43,6 +45,7 @@ type Screen =
   | { type: 'wallet' }
   | { type: 'wallet-topup' }
   | { type: 'referral' }
+  | { type: 'change-password' }
   | { type: 'notifications' }
   | { type: 'auth'; mode: AuthScreen }
   | { type: 'legal'; slug: string; title: string }
@@ -107,10 +110,48 @@ export default function AppNavigator() {
   };
 
   const handleLogout = () => {
+    teardownPushNotifications().catch(() => {});
     clearAuth();
     setLoggedIn(false);
     goToTabs('home');
   };
+
+  const navigateFromNotificationUrl = useCallback((url: string) => {
+    const target = parseNotificationUrl(url);
+    if (!target) return;
+
+    switch (target.kind) {
+      case 'order':
+        setScreen({ type: 'order', id: target.id });
+        break;
+      case 'wallet':
+        setScreen({ type: 'wallet' });
+        break;
+      case 'wallet-topup':
+        setScreen({ type: 'wallet-topup' });
+        break;
+      case 'orders-tab':
+        goToTabs('orders');
+        break;
+      case 'profile-tab':
+        goToTabs('profile');
+        break;
+      case 'cart-tab':
+        goToTabs('cart');
+        break;
+      case 'events':
+        setScreen({ type: 'events' });
+        break;
+      case 'event':
+        setScreen({ type: 'event', slug: target.slug });
+        break;
+      case 'referral':
+        setScreen({ type: 'referral' });
+        break;
+      default:
+        break;
+    }
+  }, []);
 
   const handleAuthSuccess = () => {
     setLoggedIn(true);
@@ -252,11 +293,19 @@ export default function AppNavigator() {
         );
       case 'referral':
         return <ReferralScreen onBack={() => goToTabs('profile')} />;
+      case 'change-password':
+        return (
+          <ChangePasswordScreen
+            onBack={() => goToTabs('profile')}
+            onSuccess={() => goToTabs('profile')}
+          />
+        );
       case 'notifications':
         return (
           <NotificationsScreen
             onBack={() => goToTabs(activeTab)}
             onRead={bumpNotif}
+            onNavigate={navigateFromNotificationUrl}
           />
         );
       case 'legal':
@@ -302,7 +351,10 @@ export default function AppNavigator() {
           <HomeScreen
             onGamePress={(slug, imageUrl) => slug && openGame(slug, imageUrl)}
             onVoucherCategoryPress={openVoucherCategory}
+            onViewAllGames={() => setActiveTab('games')}
             onViewAllVouchers={() => setActiveTab('vouchers')}
+            onWalletPress={() => requireLogin(() => setScreen({ type: 'wallet' }))}
+            onOrdersPress={() => requireLogin(() => setActiveTab('orders'))}
             onReferralPress={() => requireLogin(() => setScreen({ type: 'referral' }))}
             onEventsPress={() => setScreen({ type: 'events' })}
             onEventPress={(slug) => setScreen({ type: 'event', slug })}
@@ -351,6 +403,7 @@ export default function AppNavigator() {
             onReferralPress={() => setScreen({ type: 'referral' })}
             onOrdersPress={() => setActiveTab('orders')}
             onLegalPress={(slug, title) => setScreen({ type: 'legal', slug, title })}
+            onChangePasswordPress={() => setScreen({ type: 'change-password' })}
             onEventsPress={() => setScreen({ type: 'events' })}
             onNotificationsPress={openNotifications}
             notificationRefreshKey={notifRefreshKey}
@@ -377,6 +430,6 @@ export default function AppNavigator() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.black },
+  safe: { flex: 1, backgroundColor: colors.headerDark },
   flex: { flex: 1 },
 });

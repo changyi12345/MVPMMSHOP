@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { forgotPassword } from '@/lib/api/auth';
+import AuthBrandLogo from '@/components/AuthBrandLogo';
 import { useToast } from '@/components/Toast';
 import { useLang } from '@/lib/useLang';
 import PageMeta from '@/components/PageMeta';
@@ -33,7 +34,7 @@ export default function ForgotPasswordPage() {
       <PageMeta title={t('forgotPassword')} />
       <div className="auth-page">
         <div className="auth-card">
-          <div className="auth-logo">MVPMMSHOP</div>
+          <AuthBrandLogo />
           <h2 className="auth-title">{t('forgotPassword')}</h2>
           {sent ? (
             <p>{t('resetEmailSent')}</p>

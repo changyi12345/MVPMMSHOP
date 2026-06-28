@@ -155,14 +155,14 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=1043403458086-fa28d81odsntn6touqttjlqhltdo8tvp.apps
 | URL | `rankage.shop` |
 | Startup | `server.js` |
 
-### 3.4 Terminal
+### 3.4 Terminal (**`npm run build` server မှာ မလုပ်ပါ**)
 
 ```bash
 source /home/USER/nodevenv/public_html/rankage.shop/20/bin/activate
 cd /home/USER/public_html/rankage.shop
-npm install --omit=dev --ignore-scripts
-export NODE_OPTIONS=--max-old-space-size=512
-npm run build
+npm install --omit=dev
+ls -la .next/BUILD_ID server.js
+bash ~/mvpmms/deploy/check-web-cpanel.sh   # optional diagnostic
 ```
 
 ### 3.5 Restart + test

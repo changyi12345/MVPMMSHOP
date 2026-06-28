@@ -6,6 +6,7 @@ import VoucherCategoryCard from '@/components/VoucherCategoryCard';
 
 interface VouchersGridProps {
   compact?: boolean;
+  home?: boolean;
   limit?: number;
   search?: string;
   categoryFilter?: string;
@@ -15,6 +16,7 @@ interface VouchersGridProps {
 
 export default function VouchersGrid({
   compact,
+  home,
   limit,
   search = '',
   categoryFilter = 'all',
@@ -73,7 +75,13 @@ export default function VouchersGrid({
   }, [categories, search, categoryFilter, limit]);
 
   if (loading) {
-    return <p style={{ color: 'var(--dark-gray)', padding: '24px 0' }}>Loading gift cards...</p>;
+    return (
+      <div className={compact ? 'scroll-row scroll-row--home cards-scroll-mobile cards-grid-mobile' : 'grid-3 cards-scroll-mobile cards-grid-mobile'}>
+        {Array.from({ length: compact ? 6 : 6 }).map((_, i) => (
+          <div key={i} className={`game-card game-card-skeleton${home ? ' game-card--home' : ''}`} aria-hidden />
+        ))}
+      </div>
+    );
   }
 
   if (error) {
@@ -82,9 +90,9 @@ export default function VouchersGrid({
 
   return (
     <>
-      <div className={compact ? 'grid-4' : 'grid-3'}>
+      <div className={compact ? 'scroll-row scroll-row--home cards-scroll-mobile cards-grid-mobile' : 'grid-3 cards-scroll-mobile cards-grid-mobile'}>
         {visible.map((category) => (
-          <VoucherCategoryCard key={category.id} category={category} compact={compact} />
+          <VoucherCategoryCard key={category.id} category={category} compact={compact} home={home} />
         ))}
       </div>
       {!compact && visible.length === 0 && (

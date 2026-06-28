@@ -9,18 +9,31 @@ const MAINTENANCE_EXEMPT_PREFIXES = ['/maintenance', '/admin', '/auth', '/api', 
 
 type MaintenanceState = { enabled: boolean; message: string | null };
 
-let maintenanceCache: { data: MaintenanceState; ts: number } | null = null;
+/** Edge middleware must finish quickly — slow/dead API causes 504 MIDDLEWARE_INVOCATION_TIMEOUT */
+const MAINTENANCE_FETCH_TIMEOUT_MS = 2_500;
+const MAINTENANCE_CACHE_TTL_MS = 30_000;
+const MAINTENANCE_FAIL_CACHE_TTL_MS = 60_000;
+
+let maintenanceCache: { data: MaintenanceState; ts: number; failed?: boolean } | null = null;
 
 async function getMaintenanceStatus(): Promise<MaintenanceState> {
   const now = Date.now();
-  if (maintenanceCache && now - maintenanceCache.ts < 30_000) {
-    return maintenanceCache.data;
+  if (maintenanceCache) {
+    const ttl = maintenanceCache.failed
+      ? MAINTENANCE_FAIL_CACHE_TTL_MS
+      : MAINTENANCE_CACHE_TTL_MS;
+    if (now - maintenanceCache.ts < ttl) {
+      return maintenanceCache.data;
+    }
   }
+
+  const fallback: MaintenanceState = { enabled: false, message: null };
 
   try {
     const res = await fetch(`${API_BASE}/settings/shop`, {
       headers: { Accept: 'application/json' },
-      next: { revalidate: 30 },
+      signal: AbortSignal.timeout(MAINTENANCE_FETCH_TIMEOUT_MS),
+      cache: 'no-store',
     });
     if (res.ok) {
       const data = await res.json();
@@ -28,14 +41,15 @@ async function getMaintenanceStatus(): Promise<MaintenanceState> {
         enabled: Boolean(data.maintenanceMode),
         message: data.maintenanceMessage ?? null,
       };
-      maintenanceCache = { data: state, ts: now };
+      maintenanceCache = { data: state, ts: now, failed: false };
       return state;
     }
   } catch {
-    // backend unavailable — allow shop
+    // API down/slow from Vercel edge — fail open so the shop still loads
   }
 
-  return { enabled: false, message: null };
+  maintenanceCache = { data: fallback, ts: now, failed: true };
+  return fallback;
 }
 
 function isMaintenanceExempt(pathname: string): boolean {
@@ -74,15 +88,20 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // ——— Maintenance mode (shop pages only) ———
+  // ——— Maintenance mode — show home, block shop via overlay ———
+  if (pathname === '/maintenance') {
+    const url = request.nextUrl.clone();
+    url.pathname = '/';
+    url.search = '';
+    return NextResponse.redirect(url);
+  }
+
   if (!isMaintenanceExempt(pathname) && role !== 'admin') {
     const maintenance = await getMaintenanceStatus();
-    if (maintenance.enabled) {
+    if (maintenance.enabled && pathname !== '/') {
       const url = request.nextUrl.clone();
-      url.pathname = '/maintenance';
-      if (maintenance.message) {
-        url.searchParams.set('msg', maintenance.message.slice(0, 200));
-      }
+      url.pathname = '/';
+      url.search = '';
       return NextResponse.redirect(url);
     }
   }
@@ -102,6 +121,7 @@ export const config = {
   matcher: [
     '/',
     '/admin/:path*',
+    '/auth/:path*',
     '/profile/:path*',
     '/wallet/:path*',
     '/orders/:path*',
@@ -111,6 +131,11 @@ export const config = {
     '/notifications',
     '/games/:path*',
     '/vouchers/:path*',
+    '/events/:path*',
+    '/faq',
+    '/help',
+    '/terms',
+    '/privacy',
     '/maintenance',
   ],
 };

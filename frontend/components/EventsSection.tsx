@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ShopEvent } from '@/lib/api/content';
 import { resolveMediaUrl } from '@/lib/media-url';
 import { useLang } from '@/lib/useLang';
+import HomeSection from '@/components/HomeSection';
 
 interface Props {
   events: ShopEvent[];
@@ -16,15 +17,8 @@ export default function EventsSection({ events }: Props) {
   if (events.length === 0) return null;
 
   return (
-    <section className="home-section">
-      <div className="home-section-head">
-        <div>
-          <span className="home-section-badge home-section-badge--amber">📢 News</span>
-          <h2 className="home-section-title">{t('eventsNews')}</h2>
-        </div>
-        <Link href="/events" className="home-section-link">{t('viewAll')} →</Link>
-      </div>
-      <div className="events-grid">
+    <HomeSection badge="📢 News" badgeTone="amber" title={t('eventsNews')} viewAllHref="/events">
+      <div className="events-grid cards-scroll-mobile">
         {events.slice(0, 4).map((event) => {
           const img = resolveMediaUrl(event.imageUrl);
           return (
@@ -46,6 +40,6 @@ export default function EventsSection({ events }: Props) {
           );
         })}
       </div>
-    </section>
+    </HomeSection>
   );
 }

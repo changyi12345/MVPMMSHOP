@@ -1,0 +1,18 @@
+rankage.shop — deploy-web.zip (PC build, upload to cPanel)
+
+1. File Manager → public_html/rankage.shop → upload deploy-web.zip → Extract (overwrite)
+2. Terminal (after extract):
+   cd ~/public_html/rankage.shop
+   find .next public -type d -exec chmod 755 {} \;
+   find .next public -type f -exec chmod 644 {} \;
+   source ~/nodevenv/public_html/rankage.shop/20/bin/activate
+   npm install --omit=dev
+   DO NOT run: npm run build
+3. .htaccess MUST contain Passenger block (included in zip) — NOT empty!
+   If broken: copy deploy/htaccess-web.template → .htaccess
+4. cPanel → Setup Node.js App → rankage.shop → Stop → wait 5s → Start
+5. Test: https://rankage.shop/ and https://api.rankage.shop/health
+
+503 fix guide: deploy/FIX-503-MM.md
+
+Admin: admin / MvpmmsLaunch2026!

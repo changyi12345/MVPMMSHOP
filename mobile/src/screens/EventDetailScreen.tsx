@@ -62,6 +62,6 @@ export default function EventDetailScreen({ slug, onBack }: Props) {
 const styles = StyleSheet.create({
   scroll: { paddingBottom: spacing.xl },
   image: { width: '100%', height: 180, borderRadius: 8, marginBottom: spacing.md },
-  title: { color: colors.white, fontSize: 22, fontWeight: '800', marginBottom: spacing.md },
+  title: { color: colors.text, fontSize: 22, fontWeight: '800', marginBottom: spacing.md },
   body: { color: colors.darkGray, lineHeight: 24, fontSize: 15 },
 });

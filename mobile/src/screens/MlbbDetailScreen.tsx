@@ -5,7 +5,6 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  Image,
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
@@ -21,6 +20,7 @@ import { colors, spacing, radius } from '../theme/colors';
 import { screen, chip, packageStyles } from '../theme/screenStyles';
 import Button from '../components/Button';
 import ScreenHeader from '../components/ScreenHeader';
+import CircleImage from '../components/CircleImage';
 import { addToCart, buyNow, playerIdFromFields, serverIdFromFields } from '../lib/cart-store';
 
 interface Props {
@@ -163,9 +163,9 @@ export default function MlbbDetailScreen({ imageUrl, onBack, onCheckout }: Props
       <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 120 }}>
         <View style={styles.gameHeader}>
           {imageUrl ? (
-            <Image source={{ uri: imageUrl }} style={styles.gameImage} resizeMode="cover" />
+            <CircleImage uri={imageUrl} size={96} />
           ) : (
-            <Text style={styles.fallbackIcon}>⚔️</Text>
+            <CircleImage size={96} fallback={<Text style={styles.fallbackIcon}>⚔️</Text>} />
           )}
           <Text style={styles.gameName}>Mobile Legends: Bang Bang</Text>
         </View>
@@ -315,10 +315,9 @@ export default function MlbbDetailScreen({ imageUrl, onBack, onCheckout }: Props
 const styles = StyleSheet.create({
   content: { flex: 1, padding: spacing.md },
   gameHeader: { alignItems: 'center', marginBottom: spacing.md },
-  gameImage: { width: 100, height: 100, borderRadius: radius.sm, marginBottom: spacing.sm },
   fallbackIcon: { fontSize: 64, marginBottom: spacing.sm },
-  gameName: { fontSize: 18, fontWeight: '700', color: colors.white },
-  stepTitle: { fontSize: 18, fontWeight: '700', marginBottom: 4, color: colors.white },
+  gameName: { fontSize: 18, fontWeight: '700', color: colors.text },
+  stepTitle: { fontSize: 18, fontWeight: '700', marginBottom: 4, color: colors.text },
   stepHint: { fontSize: 13, color: colors.darkGray, marginBottom: spacing.md },
   regionGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   regionCard: {
@@ -335,7 +334,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(6,182,212,0.1)',
   },
   regionFlag: { fontSize: 32, marginBottom: 4 },
-  regionLabel: { fontSize: 14, fontWeight: '600', textAlign: 'center', color: colors.white },
+  regionLabel: { fontSize: 14, fontWeight: '600', textAlign: 'center', color: colors.text },
   regionLabelActive: { color: colors.cyan },
   regionNote: { fontSize: 11, color: colors.darkGray, textAlign: 'center', marginTop: 4 },
   regionBadge: {
@@ -354,7 +353,7 @@ const styles = StyleSheet.create({
   },
   notesText: { fontSize: 13, color: colors.darkGray },
   fieldBlock: { marginBottom: spacing.md },
-  label: { fontSize: 14, fontWeight: '500', marginBottom: spacing.sm, color: colors.white },
+  label: { fontSize: 14, fontWeight: '500', marginBottom: spacing.sm, color: colors.text },
   errorText: { color: colors.red, marginBottom: spacing.sm, fontSize: 14 },
   success: { color: colors.green, marginTop: spacing.sm, fontWeight: '500' },
   emptyPackages: { color: colors.darkGray, textAlign: 'center', padding: spacing.lg },

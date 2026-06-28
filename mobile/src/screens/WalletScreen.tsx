@@ -94,7 +94,7 @@ export default function WalletScreen({ onBack, onTopUp }: Props) {
 }
 
 const styles = StyleSheet.create({
-  txnDesc: { color: colors.white, fontSize: 14, fontWeight: '600' },
+  txnDesc: { color: colors.text, fontSize: 14, fontWeight: '600' },
   txnAmount: { fontSize: 15, fontWeight: '700' },
   txnStatus: { fontSize: 11, marginTop: 2 },
 });

@@ -881,6 +881,33 @@ If you received this in your inbox, SMTP is configured correctly. For best deliv
     });
   }
 
+  async retryFulfillment(orderId: number) {
+    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+    if (!order) throw new NotFoundException('Order not found');
+    if (order.status === 'COMPLETED') {
+      throw new BadRequestException('Order is already completed');
+    }
+    if (!['PROCESSING', 'PAYMENT_PENDING', 'PENDING'].includes(order.status)) {
+      throw new BadRequestException(`Cannot retry fulfillment for status ${order.status}`);
+    }
+
+    await this.logActivity('RETRY_FULFILLMENT', 'order', orderId);
+
+    await this.prisma.order.update({
+      where: { id: orderId },
+      data: { status: 'PROCESSING' },
+    });
+
+    const result = await this.fulfillment.fulfillOrder(orderId);
+    return {
+      ...result,
+      order: await this.prisma.order.findUnique({
+        where: { id: orderId },
+        include: { user: true, product: true, paymentProof: true, topUpInput: true, voucherCodes: true },
+      }),
+    };
+  }
+
   async rejectPayment(orderId: number, dto: RejectPaymentDto) {
     const order = await this.prisma.order.findUnique({
       where: { id: orderId },

@@ -9,6 +9,7 @@ import { sendPhoneOtp } from '@/lib/api/phone';
 import { fetchShopInfo } from '@/lib/api/settings';
 import { DEFAULT_FEATURE_FLAGS } from '@/lib/feature-flags';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
+import AuthBrandLogo from '@/components/AuthBrandLogo';
 import { useToast } from '@/components/Toast';
 import { useLang } from '@/lib/useLang';
 
@@ -86,7 +87,7 @@ export default function Register() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <div className="auth-logo">MVPMMSHOP</div>
+        <AuthBrandLogo />
         <h2 className="auth-title">{t('register')}</h2>
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-group">

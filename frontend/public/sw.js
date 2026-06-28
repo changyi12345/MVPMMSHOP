@@ -8,19 +8,29 @@ self.addEventListener('push', (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
-      icon: '/favicon.ico',
+      icon: '/branding/logo.jpg',
+      badge: '/branding/logo.jpg',
       data: { url: data.url || '/' },
     }),
   );
 });
 
+function resolveAbsoluteUrl(url) {
+  if (!url) return self.location.origin + '/';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  const path = url.startsWith('/') ? url : '/' + url;
+  return self.location.origin + path;
+}
+
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const url = event.notification.data?.url || '/';
+  const url = resolveAbsoluteUrl(event.notification.data?.url || '/');
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
       for (const client of list) {
-        if (client.url.includes(url) && 'focus' in client) {
+        const clientUrl = new URL(client.url);
+        const targetUrl = new URL(url);
+        if (clientUrl.pathname === targetUrl.pathname && 'focus' in client) {
           return client.focus();
         }
       }

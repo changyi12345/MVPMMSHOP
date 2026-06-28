@@ -1,10 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { colors, spacing, radius } from '../theme/colors';
-import { formatPrice } from '../data/mockData';
+import React from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+} from 'react-native';
+import { colors, spacing, shadows } from '../theme/colors';
 import { t, subscribeLang } from '../i18n';
+import TabIcon from './TabIcon';
+import type { TabId } from '../lib/uiIcons';
 
-export type TabId = 'home' | 'games' | 'vouchers' | 'cart' | 'orders' | 'profile';
+export type { TabId };
 
 interface TabBarProps {
   active: TabId;
@@ -12,67 +19,118 @@ interface TabBarProps {
   cartCount?: number;
 }
 
-const tabs: { id: TabId; icon: string; labelKey: string }[] = [
-  { id: 'home', icon: '🏠', labelKey: 'home' },
-  { id: 'games', icon: '🎮', labelKey: 'games' },
-  { id: 'vouchers', icon: '🎁', labelKey: 'vouchers' },
-  { id: 'cart', icon: '🛒', labelKey: 'cart' },
-  { id: 'orders', icon: '📦', labelKey: 'orders' },
-  { id: 'profile', icon: '👤', labelKey: 'profile' },
+const tabs: { id: TabId; labelKey: string }[] = [
+  { id: 'home', labelKey: 'home' },
+  { id: 'games', labelKey: 'games' },
+  { id: 'vouchers', labelKey: 'vouchers' },
+  { id: 'cart', labelKey: 'cart' },
+  { id: 'orders', labelKey: 'orders' },
+  { id: 'profile', labelKey: 'profile' },
 ];
 
 export default function TabBar({ active, onTabPress, cartCount = 0 }: TabBarProps) {
-  const [, bump] = useState(0);
-  useEffect(() => subscribeLang(() => bump((n) => n + 1)), []);
+  const [, bump] = React.useState(0);
+  React.useEffect(() => subscribeLang(() => bump((n) => n + 1)), []);
 
   return (
-    <View style={styles.container}>
-      {tabs.map((tab) => (
-        <TouchableOpacity
-          key={tab.id}
-          style={styles.tab}
-          onPress={() => onTabPress(tab.id)}
-          activeOpacity={0.7}
-        >
-          <View>
-            <Text style={[styles.icon, active === tab.id && styles.active]}>{tab.icon}</Text>
-            {tab.id === 'cart' && cartCount > 0 && (
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{cartCount}</Text>
+    <View style={styles.wrapper}>
+      <View style={styles.accentBar} />
+      <View style={styles.container}>
+        {tabs.map((tab) => {
+          const isActive = active === tab.id;
+          return (
+            <TouchableOpacity
+              key={tab.id}
+              style={styles.tab}
+              onPress={() => onTabPress(tab.id)}
+              activeOpacity={0.75}
+            >
+              <View style={[styles.iconWrap, isActive && styles.iconWrapActive]}>
+                <TabIcon tab={tab.id} active={isActive} size={22} />
+                {tab.id === 'cart' && cartCount > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{cartCount > 9 ? '9+' : cartCount}</Text>
+                  </View>
+                )}
               </View>
-            )}
-          </View>
-          <Text style={[styles.label, active === tab.id && styles.activeLabel]}>{t(tab.labelKey)}</Text>
-        </TouchableOpacity>
-      ))}
+              <Text style={[styles.label, isActive && styles.activeLabel]} numberOfLines={1}>
+                {t(tab.labelKey)}
+              </Text>
+              {isActive && <View style={styles.activeDot} />}
+            </TouchableOpacity>
+          );
+        })}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    backgroundColor: colors.headerDark,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    overflow: 'hidden',
+    ...shadows.card,
+  },
+  accentBar: {
+    height: 3,
+    backgroundColor: colors.cyan,
+    shadowColor: colors.cyan,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
+    elevation: 4,
+  },
   container: {
     flexDirection: 'row',
-    backgroundColor: colors.surface,
-    paddingVertical: spacing.sm,
-    paddingBottom: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.surfaceAlt,
+    paddingTop: spacing.sm,
+    paddingBottom: Platform.OS === 'android' ? spacing.md + 4 : spacing.sm,
+    paddingHorizontal: 4,
+    backgroundColor: colors.header,
   },
-  tab: { flex: 1, alignItems: 'center', gap: 2 },
-  icon: { fontSize: 22, opacity: 0.6, textAlign: 'center' },
-  active: { opacity: 1 },
-  label: { fontSize: 10, color: colors.darkGray, fontWeight: '500' },
-  activeLabel: { color: colors.cyan, fontWeight: '600' },
-  badge: {
-    position: 'absolute',
-    top: -4,
-    right: -8,
-    backgroundColor: colors.violet,
-    borderRadius: 10,
-    minWidth: 16,
-    height: 16,
+  tab: { flex: 1, alignItems: 'center', gap: 3, paddingVertical: 2 },
+  iconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  badgeText: { color: colors.white, fontSize: 10, fontWeight: '700' },
+  iconWrapActive: {
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(6, 182, 212, 0.45)',
+  },
+  label: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.55)',
+    fontWeight: '600',
+    letterSpacing: 0.2,
+  },
+  activeLabel: {
+    color: colors.white,
+    fontWeight: '800',
+  },
+  activeDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.cyan,
+    marginTop: 1,
+  },
+  badge: {
+    position: 'absolute',
+    top: -2,
+    right: -6,
+    backgroundColor: colors.pink,
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.header,
+  },
+  badgeText: { color: colors.white, fontSize: 10, fontWeight: '800' },
 });

@@ -11,6 +11,7 @@ import {
   verifyAdmin2FA,
 } from '@/lib/api/auth';
 import { useToast } from '@/components/Toast';
+import AuthBrandLogo from '@/components/AuthBrandLogo';
 import { useAdminLang } from '@/lib/useAdminLang';
 
 function AdminLoginForm() {
@@ -82,8 +83,8 @@ function AdminLoginForm() {
     <div className="auth-page">
       <div className="auth-card" style={{ maxWidth: 420 }}>
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
-          <div style={{ fontSize: 48, marginBottom: 8 }}>🔐</div>
-          <h1 className="auth-title">{t('adminLogin')}</h1>
+          <AuthBrandLogo />
+          <h1 className="auth-title" style={{ marginTop: 12, marginBottom: 4 }}>{t('adminLogin')}</h1>
           <p style={{ color: 'var(--dark-gray)', fontSize: 14 }}>{t('adminPanelDesc')}</p>
         </div>
 

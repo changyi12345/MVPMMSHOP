@@ -5,7 +5,6 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  Image,
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
@@ -20,6 +19,7 @@ import { colors, spacing, radius } from '../theme/colors';
 import { screen, chip, packageStyles } from '../theme/screenStyles';
 import Button from '../components/Button';
 import ScreenHeader from '../components/ScreenHeader';
+import CircleImage from '../components/CircleImage';
 import { addToCart, buyNow, playerIdFromFields, serverIdFromFields } from '../lib/cart-store';
 
 interface Props {
@@ -129,7 +129,7 @@ export default function GameDetailScreen({ slug, onBack, onCheckout }: Props) {
   if (!game) {
     return (
       <View style={[screen.root, styles.center]}>
-        <Text style={{ color: colors.white }}>Game not found</Text>
+        <Text style={{ color: colors.text }}>Game not found</Text>
         <Button title="Back" onPress={onBack} />
       </View>
     );
@@ -144,9 +144,9 @@ export default function GameDetailScreen({ slug, onBack, onCheckout }: Props) {
       <ScrollView style={styles.content}>
         <View style={styles.gameHeader}>
           {game.imageUrl ? (
-            <Image source={{ uri: game.imageUrl }} style={styles.gameImage} resizeMode="cover" />
+            <CircleImage uri={game.imageUrl} size={96} />
           ) : (
-            <Text style={styles.fallbackIcon}>🎮</Text>
+            <CircleImage size={96} fallback={<Text style={styles.fallbackIcon}>🎮</Text>} />
           )}
         </View>
 
@@ -259,9 +259,8 @@ const styles = StyleSheet.create({
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.black },
   content: { flex: 1, padding: spacing.md },
   gameHeader: { alignItems: 'center', marginBottom: spacing.md },
-  gameImage: { width: 120, height: 120, borderRadius: radius.sm },
   fallbackIcon: { fontSize: 64 },
-  stepTitle: { fontSize: 18, fontWeight: '700', marginBottom: spacing.md, color: colors.white },
+  stepTitle: { fontSize: 18, fontWeight: '700', marginBottom: spacing.md, color: colors.text },
   notesBox: {
     backgroundColor: 'rgba(99,102,241,0.15)',
     padding: spacing.md,
@@ -270,7 +269,7 @@ const styles = StyleSheet.create({
   },
   notesText: { fontSize: 13, color: colors.darkGray },
   fieldBlock: { marginBottom: spacing.md },
-  label: { fontSize: 14, fontWeight: '500', marginBottom: spacing.sm, color: colors.white },
+  label: { fontSize: 14, fontWeight: '500', marginBottom: spacing.sm, color: colors.text },
   chipScroll: { flexGrow: 0 },
   errorText: { color: colors.red, marginBottom: spacing.sm, fontSize: 14 },
   success: { color: colors.green, marginTop: spacing.sm, fontWeight: '500' },

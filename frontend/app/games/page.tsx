@@ -31,7 +31,7 @@ export default function GamesPage() {
         chips={chips}
         searchPlaceholder={t('searchGames')}
       />
-      <div className="shop-panel">
+      <div className="shop-panel cards-scroll-host">
         <GamesGrid search={search} platformFilter={platformFilter} />
       </div>
     </ShopPageShell>

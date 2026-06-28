@@ -1,7 +1,7 @@
 # rankage.shop Deployment Guide
 
-> **cPanel shared hosting (your plan):** see **`deploy/CPANEL.md`** ← start here  
-> VPS option: sections below / `deploy/nginx-rankage.shop.conf`
+> **VPS (recommended):** see **`deploy/VPS-SETUP-MM.md`** (Myanmar) or **`deploy/RANKAGE.md`** (English)  
+> **cPanel shared hosting:** see **`deploy/CPANEL.md`**
 
 | Service | URL |
 |---------|-----|

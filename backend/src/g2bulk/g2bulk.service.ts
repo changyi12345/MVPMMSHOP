@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { SettingsService } from '../settings/settings.service';
-import { buildFieldDefinitions, GameFieldDefinition } from './g2bulk-fields.util';
+import { buildFieldDefinitions, GameFieldDefinition, buildOrderPayload } from './g2bulk-fields.util';
 
 const G2BULK_BASE = 'https://api.g2bulk.com';
 
@@ -462,24 +462,34 @@ export class G2bulkService {
     }
   }
 
-  async placeGameOrder(payload: {
-    game: string;
-    catalogue_id?: number;
-    catalogue_name?: string;
-    userid?: string;
-    serverid?: string;
-    [key: string]: unknown;
-  }): Promise<{ success: boolean; order_id?: string; message?: string }> {
+  async placeGameOrder(
+    gameCode: string,
+    params: {
+      catalogue_id?: number;
+      catalogue_name: string;
+      playerId?: string | null;
+      serverId?: string | null;
+      charname?: string | null;
+    },
+  ): Promise<{ success: boolean; order_id?: string; message?: string }> {
     const apiKey = await this.getApiKey();
     if (!apiKey) {
       return { success: false, message: 'G2Bulk API key not configured' };
     }
+    const code = gameCode.trim();
+    if (!code) {
+      return { success: false, message: 'Game code is required' };
+    }
     try {
-      const res = await fetch(`${G2BULK_BASE}/v1/games/order`, {
-        method: 'POST',
-        headers: await this.authHeaders(),
-        body: JSON.stringify(payload),
-      });
+      const body = buildOrderPayload(params);
+      const res = await fetch(
+        `${G2BULK_BASE}/v1/games/${encodeURIComponent(code)}/order`,
+        {
+          method: 'POST',
+          headers: await this.authHeaders(),
+          body: JSON.stringify(body),
+        },
+      );
       const data = (await res.json()) as {
         success?: boolean;
         order_id?: string | number;

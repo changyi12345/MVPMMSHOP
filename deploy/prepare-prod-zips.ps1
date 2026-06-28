@@ -41,11 +41,26 @@ if (-not (Test-Path '.env.production')) {
   Copy-Item (Join-Path $root 'deploy\frontend.env.cpanel') '.env.production'
   Write-Host 'Created frontend/.env.production from deploy/frontend.env.cpanel' -ForegroundColor Yellow
 }
+# .env.local overrides .env.production and bakes localhost into deploy — hide during prod build
+$envLocalPath = Join-Path (Get-Location) '.env.local'
+$envLocalBak = Join-Path (Get-Location) '.env.local.prodbuild.bak'
+$envLocalHidden = $false
+if (Test-Path $envLocalPath) {
+  if (Select-String -Path $envLocalPath -Pattern 'NEXT_PUBLIC_API_URL' -Quiet) {
+    Move-Item $envLocalPath $envLocalBak -Force
+    $envLocalHidden = $true
+    Write-Host 'Moved .env.local aside for production build (avoid localhost in bundle)' -ForegroundColor Yellow
+  }
+}
 try {
   npm ci
   npm run build
 } catch {
   Write-Host 'WARN: frontend build skipped — using existing .next/' -ForegroundColor Yellow
+} finally {
+  if ($envLocalHidden -and (Test-Path $envLocalBak)) {
+    Move-Item $envLocalBak $envLocalPath -Force
+  }
 }
 Pop-Location
 } else {
@@ -58,9 +73,13 @@ $webZip = Join-Path $outDir 'deploy-web.zip'
 if (Test-Path $apiZip) { Remove-Item $apiZip -Force }
 if (Test-Path $webZip) { Remove-Item $webZip -Force }
 
+Write-Host '=== Copy Passenger .htaccess templates ===' -ForegroundColor Cyan
+Copy-Item (Join-Path $root 'deploy\htaccess-api.template') (Join-Path $root 'backend\.htaccess') -Force
+Copy-Item (Join-Path $root 'deploy\htaccess-web.template') (Join-Path $root 'frontend\.htaccess') -Force
+
 Write-Host '=== Zipping backend (api.rankage.shop) ===' -ForegroundColor Cyan
 $backendItems = @(
-  'package.json', 'package-lock.json', 'server.js', 'dist', 'prisma', 'uploads'
+  'package.json', 'package-lock.json', 'server.js', 'dist', 'prisma', 'uploads', '.htaccess'
 )
 $backendDir = Join-Path $root 'backend'
 $npmrcSrc = Join-Path $root 'deploy\backend.npmrc'
@@ -79,7 +98,7 @@ if ($npmrcCopied) { Remove-Item $npmrcDst -Force }
 Write-Host '=== Zipping frontend (rankage.shop) ===' -ForegroundColor Cyan
 $frontendRoot = Join-Path $root 'frontend'
 Push-Location $frontendRoot
-$webItems = @('.next', 'public', 'package.json', 'package-lock.json', 'next.config.js', 'next.config.mjs', 'server.js', '.env.production')
+$webItems = @('.next', 'public', 'package.json', 'package-lock.json', 'next.config.js', 'next.config.mjs', 'server.js', '.env.production', '.htaccess')
 $existing = $webItems | Where-Object { Test-Path $_ }
 if (-not (Test-Path 'server.js')) {
   @'

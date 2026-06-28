@@ -8,6 +8,7 @@ import { notFound } from 'next/navigation';
 import PageLayout from '@/components/PageLayout';
 import { useToast } from '@/components/Toast';
 import PlayerInfoForm from '@/components/PlayerInfoForm';
+import GameCheckoutPanel from '@/components/GameCheckoutPanel';
 import MlbbGameDetail from '@/components/MlbbGameDetail';
 import { isMlbbUnified } from '@/lib/mlbb-regions';
 import { ApiGameDetail, fetchGame, fetchGames, formatMmk, validatePlayer } from '@/lib/api/games';
@@ -104,7 +105,7 @@ function StandardGameDetail({ slug }: { slug: string }) {
   if (!game) notFound();
 
   return (
-    <>
+    <div className={selectedPackage && validated ? 'game-detail-flow game-detail-flow--checkout' : 'game-detail-flow'}>
       <div style={{ display: 'flex', gap: 20, alignItems: 'center', marginBottom: 32 }}>
         {game.imageUrl ? (
           <Image src={game.imageUrl} alt={game.name} width={120} height={120} className="game-card-image" unoptimized />
@@ -132,9 +133,9 @@ function StandardGameDetail({ slug }: { slug: string }) {
         />
       </div>
 
-      <div className="card" style={{ marginBottom: 24 }}>
+      <div className="card game-package-step" style={{ marginBottom: 24 }}>
         <h2 className="section-title">Step 2: Select Package</h2>
-        <div className="package-grid">
+        <div className="package-grid cards-scroll-mobile">
           {game.packages.map((pkg) => (
             <button
               key={pkg.id}
@@ -148,26 +149,17 @@ function StandardGameDetail({ slug }: { slug: string }) {
             </button>
           ))}
         </div>
+        {selectedPackage && validated && (
+          <GameCheckoutPanel
+            packageName={selectedPackage.name}
+            price={selectedPackage.unitPrice}
+            playerName={playerName}
+            onAddToCart={handleAddToCart}
+            onBuyNow={handleBuyNow}
+          />
+        )}
       </div>
-
-      {selectedPackage && validated && (
-        <div className="card">
-          <h2 className="section-title">Step 3: Order Summary</h2>
-          <p><strong>Package:</strong> {selectedPackage.name}</p>
-          <p><strong>Price:</strong> <span style={{ color: 'var(--gold)', fontWeight: 700 }}>{formatMmk(selectedPackage.unitPrice)}</span></p>
-          <p><strong>Player:</strong> {playerName}</p>
-          {game.playerFields.map((f) =>
-            fieldValues[f.name] ? (
-              <p key={f.name}><strong>{f.label}:</strong> {fieldValues[f.name]}</p>
-            ) : null,
-          )}
-          <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
-            <button type="button" className="btn btn-secondary" onClick={handleAddToCart}>🛒 Add to Cart</button>
-            <button type="button" className="btn btn-primary" onClick={handleBuyNow}>Buy Now</button>
-          </div>
-        </div>
-      )}
-    </>
+    </div>
   );
 }
 

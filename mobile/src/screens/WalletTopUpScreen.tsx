@@ -14,7 +14,10 @@ import { screen, select } from '../theme/screenStyles';
 import { formatPrice } from '../data/mockData';
 import Button from '../components/Button';
 import ScreenHeader from '../components/ScreenHeader';
+import PaymentProofPicker from '../components/PaymentProofPicker';
 import { requestTopUp, WALLET_TOPUP_AMOUNTS } from '../api/wallet';
+import { uploadPaymentProof } from '../api/upload';
+import { PickedImage } from '../utils/pick-image';
 import { fetchShopSettings, resolvePaymentMethods, ShopInfo } from '../api/settings';
 import { getAuth } from '../api/auth';
 import { t } from '../i18n';
@@ -30,7 +33,9 @@ export default function WalletTopUpScreen({ onBack, onSuccess }: Props) {
   const [customAmount, setCustomAmount] = useState('');
   const [payment, setPayment] = useState('');
   const [reference, setReference] = useState('');
+  const [proof, setProof] = useState<PickedImage | null>(null);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     fetchShopSettings()
@@ -67,19 +72,31 @@ export default function WalletTopUpScreen({ onBack, onSuccess }: Props) {
     }
     const method = methods.find((m) => m.id === payment);
     if (!method) return;
+    if (!proof) {
+      Alert.alert(t('uploadProof'), t('uploadRequired'));
+      return;
+    }
 
     setLoading(true);
+    setUploading(true);
     try {
-      await requestTopUp(selectedAmount, method.name, reference.trim() || undefined);
+      const proofImageUrl = await uploadPaymentProof(proof);
+      await requestTopUp(
+        selectedAmount,
+        method.name,
+        reference.trim() || undefined,
+        proofImageUrl,
+      );
       Alert.alert(
-        'Top-Up Requested',
-        `${formatPrice(selectedAmount)} top-up submitted. Awaiting payment verification.`,
+        t('topUpRequested'),
+        `${formatPrice(selectedAmount)} — ${t('topUpPendingVerify')}`,
         [{ text: 'OK', onPress: onSuccess }],
       );
     } catch (err) {
-      Alert.alert('Error', err instanceof Error ? err.message : 'Submit failed');
+      Alert.alert(t('error'), err instanceof Error ? err.message : t('uploadProofFailed'));
     } finally {
       setLoading(false);
+      setUploading(false);
     }
   };
 
@@ -136,10 +153,15 @@ export default function WalletTopUpScreen({ onBack, onSuccess }: Props) {
         </View>
 
         <View style={screen.card}>
-          <Text style={styles.sectionTitle}>Transaction Reference (optional)</Text>
+          <Text style={styles.sectionTitle}>{t('uploadProof')} *</Text>
+          <PaymentProofPicker value={proof} onChange={setProof} uploading={uploading} />
+        </View>
+
+        <View style={screen.card}>
+          <Text style={styles.sectionTitle}>{t('transactionRefOptional')}</Text>
           <TextInput
             style={screen.input}
-            placeholder="TXN reference number"
+            placeholder={t('txnReferencePlaceholder')}
             placeholderTextColor={colors.darkGray}
             value={reference}
             onChangeText={setReference}
@@ -157,7 +179,7 @@ export default function WalletTopUpScreen({ onBack, onSuccess }: Props) {
 }
 
 const styles = StyleSheet.create({
-  sectionTitle: { fontSize: 16, fontWeight: '700', marginBottom: spacing.sm, color: colors.white },
+  sectionTitle: { fontSize: 16, fontWeight: '700', marginBottom: spacing.sm, color: colors.text },
   amountGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   amountBtn: {
     width: '30%',
@@ -171,7 +193,7 @@ const styles = StyleSheet.create({
   amountBtnActive: { borderColor: colors.cyan, backgroundColor: 'rgba(6,182,212,0.12)' },
   amountText: { fontSize: 12, fontWeight: '600', color: colors.darkGray },
   amountTextActive: { color: colors.cyan },
-  paymentName: { fontWeight: '600', marginBottom: 4, color: colors.white },
+  paymentName: { fontWeight: '600', marginBottom: 4, color: colors.text },
   warning: {
     backgroundColor: 'rgba(239,68,68,0.12)',
     padding: spacing.sm,

@@ -76,7 +76,7 @@ export default function OrderDetailScreen({ orderId, onBack, onCancelled }: Prop
   if (!order) {
     return (
       <View style={[styles.container, styles.center]}>
-        <Text style={{ color: colors.white }}>Order not found</Text>
+        <Text style={{ color: colors.text }}>Order not found</Text>
         <Button title={t('back')} onPress={onBack} />
       </View>
     );
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   back: { color: colors.cyan, fontSize: 16 },
-  title: { fontSize: 18, fontWeight: '600', color: colors.white, flex: 1 },
+  title: { fontSize: 18, fontWeight: '600', color: colors.text, flex: 1 },
   content: { padding: spacing.md },
   card: {
     backgroundColor: colors.surface,
@@ -165,8 +165,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.surfaceAlt,
   },
-  sectionTitle: { fontSize: 18, fontWeight: '700', marginBottom: spacing.md, color: colors.white },
-  item: { marginBottom: 4, fontSize: 15, color: colors.white },
+  sectionTitle: { fontSize: 18, fontWeight: '700', marginBottom: spacing.md, color: colors.text },
+  item: { marginBottom: 4, fontSize: 15, color: colors.text },
   meta: { fontSize: 13, color: colors.darkGray, marginTop: 4 },
   codeBox: {
     flexDirection: 'row',
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     marginBottom: spacing.sm,
   },
-  code: { fontFamily: 'monospace', fontWeight: '600', flex: 1, color: colors.white },
+  code: { fontFamily: 'monospace', fontWeight: '600', flex: 1, color: colors.text },
   copyBtn: {
     backgroundColor: colors.cyan,
     paddingHorizontal: spacing.md,

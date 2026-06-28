@@ -70,7 +70,7 @@ export default function VoucherCategoryPage({ params }: { params: { id: string }
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <div className="grid-3">
+            <div className="grid-3 cards-scroll-mobile">
               {visible.map((voucher) => (
                 <VoucherCard key={voucher.id} voucher={voucher} />
               ))}

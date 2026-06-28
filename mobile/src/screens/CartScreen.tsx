@@ -5,7 +5,7 @@ import { formatPrice } from '../data/mockData';
 import { colors, spacing, radius } from '../theme/colors';
 import { screen } from '../theme/screenStyles';
 import Button from '../components/Button';
-import AppHeader from '../components/AppHeader';
+import MainHeader from '../components/MainHeader';
 import { subscribeLang, t } from '../i18n';
 import { validatePromo } from '../api/promos';
 
@@ -66,8 +66,7 @@ export default function CartScreen({
 
   return (
     <View style={screen.root}>
-      <AppHeader
-        title={`🛒 ${t('cart')} (${getCartItemCount()})`}
+      <MainHeader
         onNotificationsPress={onNotificationsPress}
         notificationRefreshKey={notificationRefreshKey}
         onLangChange={() => langBump((n) => n + 1)}
@@ -165,7 +164,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.surfaceAlt,
   },
-  itemName: { fontSize: 16, fontWeight: '600', marginBottom: 4, color: colors.white },
+  itemName: { fontSize: 16, fontWeight: '600', marginBottom: 4, color: colors.text },
   itemPrice: { fontSize: 15, fontWeight: '700', color: colors.cyan },
   qtyRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   qtyBtn: {
@@ -177,10 +176,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   qtyBtnText: { color: colors.white, fontWeight: '700' },
-  qty: { fontSize: 16, fontWeight: '500', minWidth: 24, textAlign: 'center', color: colors.white },
+  qty: { fontSize: 16, fontWeight: '500', minWidth: 24, textAlign: 'center', color: colors.text },
   remove: { color: colors.red, fontSize: 18, padding: 4 },
   subtotal: { fontSize: 14, color: colors.darkGray, marginBottom: 4, textAlign: 'center' },
-  total: { fontSize: 20, fontWeight: '700', marginBottom: spacing.md, textAlign: 'center', color: colors.white },
+  total: { fontSize: 20, fontWeight: '700', marginBottom: spacing.md, textAlign: 'center', color: colors.text },
   promoBox: {
     marginTop: spacing.md,
     backgroundColor: colors.surface,
@@ -189,7 +188,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.surfaceAlt,
   },
-  promoLabel: { color: colors.white, fontWeight: '600', marginBottom: spacing.sm },
+  promoLabel: { color: colors.text, fontWeight: '600', marginBottom: spacing.sm },
   promoRow: { flexDirection: 'row', gap: spacing.sm },
   promoInput: {
     flex: 1,
@@ -197,7 +196,7 @@ const styles = StyleSheet.create({
     borderColor: colors.lightGray,
     borderRadius: radius.sm,
     padding: spacing.sm,
-    color: colors.white,
+    color: colors.text,
     backgroundColor: colors.black,
   },
   promoBtn: {

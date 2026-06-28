@@ -2,18 +2,24 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import GameCard from '@/components/GameCard';
-import { ApiGame, fetchGames } from '@/lib/api/games';
+import { ApiGame, fetchGames, fetchPopularGames } from '@/lib/api/games';
 import { groupGamesForDisplay } from '@/lib/groupGames';
 import { matchesGamePlatformFilter, type GamePlatformFilter } from '@/lib/game-platform';
 
 interface GamesGridProps {
   compact?: boolean;
+  home?: boolean;
+  popular?: boolean;
+  limit?: number;
   search?: string;
   platformFilter?: GamePlatformFilter;
 }
 
 export default function GamesGrid({
   compact,
+  home,
+  popular,
+  limit = 12,
   search = '',
   platformFilter = 'all',
 }: GamesGridProps) {
@@ -22,11 +28,12 @@ export default function GamesGrid({
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchGames()
+    const loader = popular ? fetchPopularGames(limit) : fetchGames();
+    loader
       .then((data) => setGames(groupGamesForDisplay(data)))
       .catch(() => setError('Games load မအောင်မြင်ပါ'))
       .finally(() => setLoading(false));
-  }, []);
+  }, [popular, limit]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -39,9 +46,9 @@ export default function GamesGrid({
 
   if (loading) {
     return (
-      <div className={compact ? 'scroll-row' : 'grid-4'}>
-        {Array.from({ length: compact ? 4 : 8 }).map((_, i) => (
-          <div key={i} className="game-card game-card-skeleton" aria-hidden />
+      <div className={compact ? 'scroll-row scroll-row--home cards-scroll-mobile cards-grid-mobile' : 'grid-4 cards-scroll-mobile cards-grid-mobile'}>
+        {Array.from({ length: compact ? 6 : 8 }).map((_, i) => (
+          <div key={i} className={`game-card game-card-skeleton${home ? ' game-card--home' : ''}`} aria-hidden />
         ))}
       </div>
     );
@@ -62,16 +69,16 @@ export default function GamesGrid({
 
   if (compact) {
     return (
-      <div className="scroll-row">
+      <div className="scroll-row scroll-row--home cards-scroll-mobile cards-grid-mobile">
         {filtered.map((game) => (
-          <GameCard key={game.code} game={game} compact />
+          <GameCard key={game.code} game={game} compact home={home} />
         ))}
       </div>
     );
   }
 
   return (
-    <div className="grid-4">
+    <div className="grid-4 cards-scroll-mobile cards-grid-mobile">
       {filtered.map((game) => (
         <GameCard key={game.code} game={game} />
       ))}

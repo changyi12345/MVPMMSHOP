@@ -6,6 +6,7 @@ import AuthCookieSync from './AuthCookieSync';
 import ShopProvider from './ShopProvider';
 import UserNotificationProvider from './UserNotificationProvider';
 import GoogleAnalytics from './GoogleAnalytics';
+import MaintenanceGate from './MaintenanceGate';
 
 const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? '';
 
@@ -16,7 +17,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         <UserNotificationProvider>
           <GoogleAnalytics />
           <AuthCookieSync />
-          {children}
+          <MaintenanceGate>{children}</MaintenanceGate>
         </UserNotificationProvider>
       </ShopProvider>
     </ToastProvider>

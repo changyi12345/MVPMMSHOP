@@ -80,6 +80,6 @@ const styles = StyleSheet.create({
   },
   image: { width: '100%', height: 140 },
   cardBody: { padding: spacing.md },
-  title: { color: colors.white, fontSize: 16, fontWeight: '700', marginBottom: 4 },
+  title: { color: colors.text, fontSize: 16, fontWeight: '700', marginBottom: 4 },
   excerpt: { color: colors.darkGray, lineHeight: 20 },
 });

@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { colors, spacing, radius } from '../theme/colors';
+import AuthBrandLogo from '../components/AuthBrandLogo';
 import Button from '../components/Button';
 import {
   GoogleSignin,
@@ -127,7 +128,7 @@ export default function RegisterScreen({ onSuccess, onLoginPress }: Props) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.logo}>MVPMMSHOP</Text>
+        <AuthBrandLogo />
         <Text style={styles.title}>{t('registerTitle')}</Text>
 
         <View style={styles.form}>
@@ -228,42 +229,35 @@ export default function RegisterScreen({ onSuccess, onLoginPress }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.black },
+  container: { flex: 1, backgroundColor: colors.background },
   content: { flexGrow: 1, justifyContent: 'center', padding: spacing.lg },
-  logo: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: colors.violetLight,
-    textAlign: 'center',
-    marginBottom: spacing.sm,
-  },
   title: {
     fontSize: 24,
-    fontWeight: '600',
-    color: colors.white,
+    fontWeight: '700',
+    color: colors.textTitle,
     textAlign: 'center',
     marginBottom: spacing.xl,
   },
   form: {
     backgroundColor: colors.surface,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     padding: spacing.lg,
     borderWidth: 1,
-    borderColor: colors.surfaceAlt,
+    borderColor: colors.borderBrand,
   },
-  label: { fontSize: 14, fontWeight: '500', marginBottom: spacing.sm, marginTop: spacing.sm, color: colors.white },
+  label: { fontSize: 14, fontWeight: '500', marginBottom: spacing.sm, marginTop: spacing.sm, color: colors.text },
   input: {
     borderWidth: 1,
-    borderColor: colors.lightGray,
+    borderColor: colors.border,
     borderRadius: radius.sm,
     padding: spacing.md,
     fontSize: 16,
     minHeight: 44,
-    color: colors.white,
-    backgroundColor: colors.black,
+    color: colors.text,
+    backgroundColor: colors.surfaceMuted,
   },
   otpRow: { flexDirection: 'row', gap: spacing.sm, alignItems: 'center' },
   error: { color: colors.red, fontSize: 13, marginTop: spacing.sm },
-  switch: { textAlign: 'center', color: 'rgba(255,255,255,0.8)', marginTop: spacing.lg },
-  switchLink: { color: colors.cyan, fontWeight: '600' },
+  switch: { textAlign: 'center', color: colors.textMuted, marginTop: spacing.lg },
+  switchLink: { color: colors.violet, fontWeight: '600' },
 });

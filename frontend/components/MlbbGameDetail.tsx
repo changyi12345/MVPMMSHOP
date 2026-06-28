@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import PlayerInfoForm from '@/components/PlayerInfoForm';
+import GameCheckoutPanel from '@/components/GameCheckoutPanel';
 import { useToast } from '@/components/Toast';
 import { MLBB_REGIONS, MlbbRegion } from '@/lib/mlbb-regions';
 import { ApiGameDetail, fetchGame, formatMmk, validatePlayer } from '@/lib/api/games';
@@ -116,7 +117,7 @@ export default function MlbbGameDetail({ imageUrl }: Props) {
   };
 
   return (
-    <>
+    <div className={selectedPackage && validated ? 'game-detail-flow game-detail-flow--checkout' : 'game-detail-flow'}>
       <div style={{ display: 'flex', gap: 20, alignItems: 'center', marginBottom: 32 }}>
         {imageUrl ? (
           <Image src={imageUrl} alt="Mobile Legends" width={120} height={120} className="game-card-image" unoptimized />
@@ -134,7 +135,7 @@ export default function MlbbGameDetail({ imageUrl }: Props) {
         <p style={{ color: 'var(--dark-gray)', marginBottom: 16, fontSize: 14 }}>
           Player account ရှိတဲ့ region ကို ရွေးပါ
         </p>
-        <div className="region-grid">
+        <div className="region-grid cards-scroll-mobile">
           {MLBB_REGIONS.map((region) => (
             <button
               key={region.id}
@@ -173,48 +174,42 @@ export default function MlbbGameDetail({ imageUrl }: Props) {
             />
           </div>
 
-          <div className="card" style={{ marginBottom: 24 }}>
+          <div className="card game-package-step" style={{ marginBottom: 24 }}>
             <h2 className="section-title">Step 3: Select Package</h2>
             {game.packages.length === 0 ? (
               <p className="empty-text">Package မရှိသေးပါ</p>
             ) : (
-              <div className="package-grid">
-                {game.packages.map((pkg) => (
-                  <button
-                    key={pkg.id}
-                    type="button"
-                    className={`package-item ${selectedPackageId === pkg.id ? 'selected' : ''}`}
-                    onClick={() => validated && setSelectedPackageId(pkg.id)}
-                    disabled={!validated}
-                  >
-                    <div className="package-name">{pkg.name}</div>
-                    <div className="package-price">{formatMmk(pkg.unitPrice)}</div>
-                  </button>
-                ))}
-              </div>
+              <>
+                <div className="package-grid cards-scroll-mobile">
+                  {game.packages.map((pkg) => (
+                    <button
+                      key={pkg.id}
+                      type="button"
+                      className={`package-item ${selectedPackageId === pkg.id ? 'selected' : ''}`}
+                      onClick={() => validated && setSelectedPackageId(pkg.id)}
+                      disabled={!validated}
+                    >
+                      <div className="package-name">{pkg.name}</div>
+                      <div className="package-price">{formatMmk(pkg.unitPrice)}</div>
+                    </button>
+                  ))}
+                </div>
+                {selectedPackage && validated && (
+                  <GameCheckoutPanel
+                    packageName={selectedPackage.name}
+                    price={selectedPackage.unitPrice}
+                    playerName={playerName}
+                    regionLabel={selectedRegion.label}
+                    regionFlag={selectedRegion.flag}
+                    onAddToCart={handleAddToCart}
+                    onBuyNow={handleBuyNow}
+                  />
+                )}
+              </>
             )}
           </div>
-
-          {selectedPackage && validated && (
-            <div className="card">
-              <h2 className="section-title">Order Summary</h2>
-              <p><strong>Region:</strong> {selectedRegion.flag} {selectedRegion.label}</p>
-              <p><strong>Package:</strong> {selectedPackage.name}</p>
-              <p><strong>Price:</strong> <span style={{ color: 'var(--gold)', fontWeight: 700 }}>{formatMmk(selectedPackage.unitPrice)}</span></p>
-              <p><strong>Player:</strong> {playerName}</p>
-              {game.playerFields.map((f) =>
-                fieldValues[f.name] ? (
-                  <p key={f.name}><strong>{f.label}:</strong> {fieldValues[f.name]}</p>
-                ) : null,
-              )}
-              <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
-                <button type="button" className="btn btn-secondary" onClick={handleAddToCart}>🛒 Add to Cart</button>
-                <button type="button" className="btn btn-primary" onClick={handleBuyNow}>Buy Now</button>
-              </div>
-            </div>
-          )}
         </>
       )}
-    </>
+    </div>
   );
 }

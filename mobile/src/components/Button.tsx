@@ -1,10 +1,6 @@
 import React from 'react';
-import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-} from 'react-native';
-import { colors, radius, spacing } from '../theme/colors';
+import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { colors, radius, spacing, shadows } from '../theme/colors';
 
 type Variant = 'primary' | 'secondary' | 'outline' | 'blue';
 
@@ -29,13 +25,13 @@ export default function Button({
     primary: colors.violet,
     secondary: colors.cyan,
     outline: 'transparent',
-    blue: colors.violetDark,
+    blue: colors.headerDark,
   };
 
   const textColor: Record<Variant, string> = {
     primary: colors.white,
-    secondary: colors.black,
-    outline: colors.cyan,
+    secondary: colors.textTitle,
+    outline: colors.cyanDark,
     blue: colors.white,
   };
 
@@ -46,6 +42,7 @@ export default function Button({
       style={[
         styles.btn,
         { backgroundColor: bg[variant] },
+        variant === 'primary' && shadows.sm,
         variant === 'outline' && styles.outline,
         fullWidth && styles.full,
         small && styles.small,
@@ -64,16 +61,17 @@ const styles = StyleSheet.create({
   btn: {
     paddingVertical: 14,
     paddingHorizontal: spacing.lg,
-    borderRadius: radius.sm,
+    borderRadius: radius.pill,
     alignItems: 'center',
   },
   outline: {
     borderWidth: 2,
     borderColor: colors.cyan,
+    backgroundColor: colors.surface,
   },
   full: { width: '100%' },
   small: { paddingVertical: 8, paddingHorizontal: spacing.md },
   disabled: { opacity: 0.5 },
-  text: { fontSize: 16, fontWeight: '600' },
+  text: { fontSize: 16, fontWeight: '700' },
   smallText: { fontSize: 14 },
 });

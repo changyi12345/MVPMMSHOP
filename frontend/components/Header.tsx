@@ -1,14 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import LangToggle from './LangToggle';
 import UserMenu from './UserMenu';
+import BrandLogo from './BrandLogo';
+import ShopIcon from './ShopIcon';
 import { useShop } from './ShopProvider';
 import { useLang } from '@/lib/useLang';
-import { resolveMediaUrl } from '@/lib/media-url';
 import { CART_CHANGE_EVENT, getCartItemCount } from '@/lib/cart-store';
 import { useAuthUser } from '@/lib/use-auth';
 import { formatPrice } from '@/lib/format-price';
@@ -28,11 +28,10 @@ export default function Header() {
   const shop = useShop();
   const { user, isLoggedIn } = useAuthUser();
   const { t } = useLang();
-  const [menuOpen, setMenuOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
 
   const shopName = shop?.shopName ?? 'MVPMMSHOP';
-  const logoSrc = resolveMediaUrl(shop?.logoUrl ?? null);
 
   useEffect(() => {
     const refresh = () => setCartCount(getCartItemCount());
@@ -46,9 +45,11 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [menuOpen]);
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const allLinks: (NavLink & { flag?: keyof FeatureFlags })[] = [
     { href: '/', label: t('home'), icon: '🏠' },
@@ -69,18 +70,30 @@ export default function Header() {
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname.startsWith(href);
 
-  const closeMenu = () => setMenuOpen(false);
-
   return (
-    <header className="header">
+    <header className={`header${scrolled ? ' header--scrolled' : ''}`}>
+      <div className="header-accent" aria-hidden />
       <div className="header-inner">
-        <Link href="/" className="logo" onClick={closeMenu}>
-          {logoSrc ? (
-            <Image src={logoSrc} alt={shopName} width={140} height={40} unoptimized className="logo-image" />
-          ) : (
-            <span className="logo-text">{shopName}</span>
-          )}
-        </Link>
+        <div className="header-logo-center">
+          <Link href="/" className="logo" aria-label={shopName}>
+            <span className="logo-mark" aria-hidden="true">
+              <span className="logo-ring" />
+              <span className="logo-ring-glow" />
+              <span className="logo-mark-inner">
+                <BrandLogo
+                  shopLogoUrl={shop?.logoUrl}
+                  shopName={shopName}
+                  priority
+                  variant="mark"
+                />
+              </span>
+            </span>
+            <span className="logo-brand">
+              <span className="logo-label">{shopName}</span>
+              <span className="logo-tagline">Game Top-Up</span>
+            </span>
+          </Link>
+        </div>
 
         <nav className="nav" aria-label="Main navigation">
           {visibleLinks.map((link) => (
@@ -98,97 +111,24 @@ export default function Header() {
         <div className="header-toolbar">
           {isLoggedIn && user?.walletBalance != null && (
             <Link href="/wallet" className="header-wallet-chip" title={t('wallet')}>
-              <span aria-hidden>💰</span>
+              <ShopIcon name="wallet" size={16} />
               <span>{formatPrice(user.walletBalance)}</span>
             </Link>
           )}
-          <LangToggle />
-          {isLoggedIn && <UserNotificationBell />}
-          <Link href="/cart" className="header-cart-btn" aria-label={t('cart')}>
-            <span aria-hidden>🛒</span>
+          <LangToggle compact />
+          {isLoggedIn && <UserNotificationBell inHeader />}
+          <Link href="/cart" className="header-icon-btn header-cart-btn" aria-label={t('cart')}>
+            <ShopIcon name="cart" size={20} />
             {cartCount > 0 && <span className="header-cart-badge">{cartCount > 99 ? '99+' : cartCount}</span>}
           </Link>
+          {!isLoggedIn && (
+            <Link href="/auth/login" className="header-icon-btn header-login-icon" aria-label={t('login')}>
+              <ShopIcon name="profile" size={20} />
+            </Link>
+          )}
           <UserMenu />
-          <button
-            type="button"
-            className={`menu-toggle ${menuOpen ? 'open' : ''}`}
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
-            aria-expanded={menuOpen}
-          >
-            <span /><span /><span />
-          </button>
         </div>
       </div>
-
-      <div className={`mobile-nav-overlay ${menuOpen ? 'open' : ''}`} onClick={closeMenu} aria-hidden={!menuOpen} />
-      <nav className={`mobile-nav ${menuOpen ? 'open' : ''}`} aria-label="Mobile navigation">
-        <div className="mobile-nav-section">
-          <p className="mobile-nav-label">{t('shopMenu')}</p>
-          {allLinks.filter((l) => !l.authOnly).map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`mobile-nav-link ${isActive(link.href) ? 'active' : ''}`}
-              onClick={closeMenu}
-            >
-              <span className="nav-icon" aria-hidden>{link.icon}</span>
-              {link.label}
-            </Link>
-          ))}
-          <Link
-            href="/cart"
-            className={`mobile-nav-link ${isActive('/cart') ? 'active' : ''}`}
-            onClick={closeMenu}
-          >
-            <span className="nav-icon" aria-hidden>🛒</span>
-            {t('cart')}
-            {cartCount > 0 && <span className="mobile-nav-badge">{cartCount}</span>}
-          </Link>
-        </div>
-
-        <div className="mobile-nav-section">
-          <p className="mobile-nav-label">{t('accountMenu')}</p>
-          {isLoggedIn ? (
-            <>
-              {user?.walletBalance != null && (
-                <div className="mobile-nav-wallet">
-                  💰 {formatPrice(user.walletBalance)}
-                </div>
-              )}
-              <Link href="/wallet" className={`mobile-nav-link ${isActive('/wallet') ? 'active' : ''}`} onClick={closeMenu}>
-                <span className="nav-icon" aria-hidden>💰</span>
-                {t('wallet')}
-              </Link>
-              <Link href="/orders" className={`mobile-nav-link ${isActive('/orders') ? 'active' : ''}`} onClick={closeMenu}>
-                <span className="nav-icon" aria-hidden>📦</span>
-                {t('orders')}
-              </Link>
-              <Link href="/notifications" className={`mobile-nav-link ${isActive('/notifications') ? 'active' : ''}`} onClick={closeMenu}>
-                <span className="nav-icon" aria-hidden>🔔</span>
-                {t('notifications')}
-              </Link>
-              <Link href="/profile" className={`mobile-nav-link ${isActive('/profile') ? 'active' : ''}`} onClick={closeMenu}>
-                <span className="nav-icon" aria-hidden>👤</span>
-                {t('profile')}
-              </Link>
-              <Link href="/referral" className={`mobile-nav-link ${isActive('/referral') ? 'active' : ''}`} onClick={closeMenu}>
-                <span className="nav-icon" aria-hidden>🎁</span>
-                {t('referral')}
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link href="/auth/login" className="mobile-nav-link mobile-nav-cta" onClick={closeMenu}>
-                {t('login')}
-              </Link>
-              <Link href="/auth/register" className="mobile-nav-link" onClick={closeMenu}>
-                {t('register')}
-              </Link>
-            </>
-          )}
-        </div>
-      </nav>
     </header>
   );
 }

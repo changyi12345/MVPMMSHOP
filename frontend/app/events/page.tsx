@@ -35,7 +35,7 @@ export default function EventsPage() {
           <p className="empty-text">{t('noEvents')}</p>
         </div>
       ) : (
-        <div className="events-grid">
+        <div className="events-grid cards-scroll-mobile">
           {events.map((event) => {
             const img = resolveMediaUrl(event.imageUrl);
             return (

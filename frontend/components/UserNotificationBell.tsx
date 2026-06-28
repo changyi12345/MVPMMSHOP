@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useUserNotifications } from '@/components/UserNotificationProvider';
 import { notificationIcon } from '@/lib/api/notifications';
 import { useLang } from '@/lib/useLang';
+import ShopIcon from './ShopIcon';
 
 function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
@@ -17,10 +18,10 @@ function timeAgo(iso: string) {
   return new Date(iso).toLocaleDateString();
 }
 
-export default function UserNotificationBell() {
+export default function UserNotificationBell({ inHeader = false }: { inHeader?: boolean }) {
   const router = useRouter();
   const { t } = useLang();
-  const { unreadCount, items, refresh, markRead } = useUserNotifications();
+  const { unreadCount, items, refresh, markRead, markAllRead } = useUserNotifications();
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -47,14 +48,14 @@ export default function UserNotificationBell() {
     <div className="user-notif-wrap" ref={panelRef}>
       <button
         type="button"
-        className="user-notif-btn"
+        className={`user-notif-btn${inHeader ? ' user-notif-btn--header header-icon-btn' : ''}`}
         aria-label={`${t('notifications')}${unreadCount ? `, ${unreadCount} unread` : ''}`}
         onClick={() => {
           setOpen((v) => !v);
           if (!open) void refresh();
         }}
       >
-        🔔
+        <ShopIcon name="bell" size={20} />
         {unreadCount > 0 && (
           <span className="user-notif-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
         )}
@@ -64,9 +65,20 @@ export default function UserNotificationBell() {
         <div className="user-notif-panel">
           <div className="user-notif-panel-head">
             <strong>{t('notifications')}</strong>
-            <button type="button" className="btn btn-outline btn-sm" onClick={() => void refresh()}>
-              ↻
-            </button>
+            <div className="user-notif-panel-actions">
+              {unreadCount > 0 && (
+                <button
+                  type="button"
+                  className="btn btn-outline btn-sm user-notif-mark-all"
+                  onClick={() => void markAllRead()}
+                >
+                  {t('markAllRead')}
+                </button>
+              )}
+              <button type="button" className="btn btn-outline btn-sm" onClick={() => void refresh()}>
+                ↻
+              </button>
+            </div>
           </div>
 
           {items.length === 0 ? (

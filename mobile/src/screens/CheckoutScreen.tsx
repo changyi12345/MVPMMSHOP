@@ -24,8 +24,9 @@ import {
   resolvePrimaryOrderId,
   submitPaymentProof,
 } from '../api/orders';
-import { uploadPaymentProofUri } from '../api/upload';
-import { pickPaymentProofImage } from '../utils/pick-image';
+import { uploadPaymentProof } from '../api/upload';
+import { PickedImage } from '../utils/pick-image';
+import PaymentProofPicker from '../components/PaymentProofPicker';
 
 interface Props {
   onBack: () => void;
@@ -45,7 +46,7 @@ export default function CheckoutScreen({ onBack, onSuccess }: Props) {
     { id: string; name: string; accountNumber: string; accountHolder: string }[]
   >([]);
   const [reference, setReference] = useState('');
-  const [proofUri, setProofUri] = useState<string | null>(null);
+  const [proof, setProof] = useState<PickedImage | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingShop, setLoadingShop] = useState(true);
 
@@ -78,11 +79,6 @@ export default function CheckoutScreen({ onBack, onSuccess }: Props) {
   const canPayWithWallet = walletBalance >= total;
   const selectedMethod = paymentOptions.find((m) => m.id === payment);
 
-  const pickImage = async () => {
-    const picked = await pickPaymentProofImage();
-    if (picked) setProofUri(picked.uri);
-  };
-
   const handleSubmit = async () => {
     if (!cartItems.length) {
       Alert.alert('Empty cart', 'Add items before checkout');
@@ -104,14 +100,15 @@ export default function CheckoutScreen({ onBack, onSuccess }: Props) {
 
       if (payment !== 'wallet') {
         let imageUrl: string | undefined;
-        if (proofUri) {
+        if (proof) {
           try {
-            imageUrl = await uploadPaymentProofUri(proofUri);
-          } catch {
-            const base64 = await fetch(proofUri).then((r) => r.blob()).catch(() => null);
-            if (base64) {
-              // fallback skipped — reference only
-            }
+            imageUrl = await uploadPaymentProof(proof);
+          } catch (uploadErr) {
+            Alert.alert(
+              t('uploadProofFailed'),
+              uploadErr instanceof Error ? uploadErr.message : t('requestFailed'),
+            );
+            return;
           }
         }
         await submitPaymentProof(orderId, {
@@ -207,10 +204,7 @@ export default function CheckoutScreen({ onBack, onSuccess }: Props) {
             <>
               <View style={screen.card}>
                 <Text style={styles.sectionTitle}>Payment Proof</Text>
-                <TouchableOpacity style={styles.uploadZone} onPress={pickImage}>
-                  <Text style={styles.uploadIcon}>📷</Text>
-                  <Text>{proofUri ? 'Photo selected — tap to change' : 'Choose screenshot'}</Text>
-                </TouchableOpacity>
+                <PaymentProofPicker value={proof} onChange={setProof} uploading={loading} />
               </View>
               <View style={screen.card}>
                 <Text style={styles.sectionTitle}>Transaction Reference</Text>
@@ -242,12 +236,12 @@ export default function CheckoutScreen({ onBack, onSuccess }: Props) {
 
 const styles = StyleSheet.create({
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.black },
-  emptyMsg: { color: colors.white, marginBottom: spacing.md },
-  sectionTitle: { fontSize: 18, fontWeight: '700', marginBottom: spacing.md, color: colors.white },
+  emptyMsg: { color: colors.text, marginBottom: spacing.md },
+  sectionTitle: { fontSize: 18, fontWeight: '700', marginBottom: spacing.md, color: colors.text },
   item: { marginBottom: 4, color: colors.darkGray },
   discount: { color: colors.green, marginTop: spacing.sm },
   total: { fontSize: 18, fontWeight: '700', marginTop: spacing.sm, color: colors.cyan },
-  paymentName: { fontWeight: '600', marginBottom: 2, color: colors.white },
+  paymentName: { fontWeight: '600', marginBottom: 2, color: colors.text },
   paymentAccount: { fontSize: 13, color: colors.darkGray },
   paymentHolder: { fontSize: 12, color: colors.darkGray, marginTop: 2 },
   walletNote: {
@@ -264,13 +258,4 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   warningText: { fontWeight: '600', color: colors.red },
-  uploadZone: {
-    borderWidth: 2,
-    borderStyle: 'dashed',
-    borderColor: colors.surfaceAlt,
-    borderRadius: radius.md,
-    padding: spacing.xl,
-    alignItems: 'center',
-  },
-  uploadIcon: { fontSize: 40, marginBottom: spacing.sm },
 });

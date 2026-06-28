@@ -44,7 +44,7 @@ export default function VouchersPage() {
         searchPlaceholder={t('searchVouchers')}
         scrollChips
       />
-      <div className="shop-panel">
+      <div className="shop-panel cards-scroll-host">
         <VouchersGrid
           search={search}
           categoryFilter={categoryFilter}

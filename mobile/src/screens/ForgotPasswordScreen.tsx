@@ -9,6 +9,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
+import AuthBrandLogo from '../components/AuthBrandLogo';
 import ScreenHeader from '../components/ScreenHeader';
 import Button from '../components/Button';
 import { colors, spacing, radius } from '../theme/colors';
@@ -47,6 +48,7 @@ export default function ForgotPasswordScreen({ onBack }: Props) {
     <KeyboardAvoidingView style={screen.root} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScreenHeader title={t('forgotPassword')} onBack={onBack} />
       <ScrollView contentContainerStyle={[screen.content, styles.scroll]}>
+        <AuthBrandLogo />
         {sent ? (
           <View style={styles.card}>
             <Text style={styles.successTitle}>{t('resetEmailSent')}</Text>
@@ -83,23 +85,23 @@ const styles = StyleSheet.create({
   scroll: { flexGrow: 1, justifyContent: 'center' },
   card: {
     backgroundColor: colors.surface,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     padding: spacing.lg,
     borderWidth: 1,
-    borderColor: colors.surfaceAlt,
+    borderColor: colors.borderBrand,
   },
-  hint: { color: colors.darkGray, marginBottom: spacing.md, lineHeight: 20 },
-  label: { color: colors.white, fontWeight: '500', marginBottom: spacing.sm },
+  hint: { color: colors.textMuted, marginBottom: spacing.md, lineHeight: 20 },
+  label: { color: colors.text, fontWeight: '500', marginBottom: spacing.sm },
   input: {
     borderWidth: 1,
-    borderColor: colors.lightGray,
+    borderColor: colors.border,
     borderRadius: radius.sm,
     padding: spacing.md,
-    color: colors.white,
-    backgroundColor: colors.black,
+    color: colors.text,
+    backgroundColor: colors.surfaceMuted,
     marginBottom: spacing.sm,
   },
   error: { color: colors.red, marginBottom: spacing.sm },
-  successTitle: { color: colors.white, fontSize: 18, fontWeight: '700', marginBottom: spacing.sm },
-  successBody: { color: colors.darkGray, marginBottom: spacing.lg, lineHeight: 20 },
+  successTitle: { color: colors.textTitle, fontSize: 18, fontWeight: '700', marginBottom: spacing.sm },
+  successBody: { color: colors.textMuted, marginBottom: spacing.lg, lineHeight: 20 },
 });

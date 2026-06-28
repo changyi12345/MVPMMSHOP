@@ -55,14 +55,18 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=1043403458086-fa28d81odsntn6touqttjlqhltdo8tvp.apps
 NEXT_PUBLIC_VAPID_PUBLIC_KEY=<paste public key from Step 6>
 ```
 
-3. Terminal:
+3. Terminal (**`npm run build` မလုပ်ပါနဲ့** — zip ထဲမှာ `app/` မပါ၊ PC မှာ build ထားတဲ့ `.next` သာ):
 
 ```bash
 cd ~/public_html/rankage.shop
+source ~/nodevenv/public_html/rankage.shop/20/bin/activate
 npm install --omit=dev
+ls -la .next/BUILD_ID server.js
 ```
 
-4. **Restart** Node app
+> Server မှာ `npm run build` run ရင် `Couldn't find any pages or app directory` error ထွက်မယ် — normal ဖြစ်ပါတယ်။
+
+4. cPanel → **Setup Node.js App** → rankage.shop → **Restart** (Terminal က `node server.js` manual run မလုပ်ပါနဲ့)
 
 **Verify:** `https://rankage.shop` and `https://rankage.shop/admin/login`
 

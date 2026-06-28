@@ -315,6 +315,11 @@ export class AdminController {
     return this.adminService.verifyPayment(+id);
   }
 
+  @Post('orders/:id/retry-fulfillment')
+  retryFulfillment(@Param('id') id: string) {
+    return this.adminService.retryFulfillment(+id);
+  }
+
   @Post('orders/:id/reject-payment')
   rejectPayment(@Param('id') id: string, @Body() dto: RejectPaymentDto) {
     return this.adminService.rejectPayment(+id, dto);

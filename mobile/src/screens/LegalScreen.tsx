@@ -60,6 +60,6 @@ export default function LegalScreen({ slug, title, onBack }: Props) {
 
 const styles = StyleSheet.create({
   scroll: { paddingBottom: spacing.xl },
-  sectionTitle: { color: colors.white, fontSize: 17, fontWeight: '700', marginBottom: spacing.sm, marginTop: spacing.md },
+  sectionTitle: { color: colors.text, fontSize: 17, fontWeight: '700', marginBottom: spacing.sm, marginTop: spacing.md },
   sectionBody: { color: colors.darkGray, lineHeight: 22 },
 });

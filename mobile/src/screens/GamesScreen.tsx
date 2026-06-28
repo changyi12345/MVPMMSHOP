@@ -15,7 +15,7 @@ import { colors, spacing, radius } from '../theme/colors';
 import { screen } from '../theme/screenStyles';
 import GameCard from '../components/GameCard';
 import NetworkErrorView from '../components/NetworkErrorView';
-import AppHeader from '../components/AppHeader';
+import MainHeader from '../components/MainHeader';
 import { useApiLoad } from '../hooks/useApiLoad';
 import { subscribeLang, t } from '../i18n';
 
@@ -58,8 +58,7 @@ export default function GamesScreen({
 
   return (
     <View style={screen.root}>
-      <AppHeader
-        title={`🎮 ${t('games')}`}
+      <MainHeader
         onNotificationsPress={onNotificationsPress}
         notificationRefreshKey={notificationRefreshKey}
         onLangChange={() => langBump((n) => n + 1)}

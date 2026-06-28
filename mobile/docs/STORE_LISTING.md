@@ -37,7 +37,7 @@ Upload AAB from `mobile/android/app/build/outputs/bundle/release/`.
 ## Pre-submission checklist
 
 - [ ] Production API: `https://api.rankage.shop`
-- [ ] Google OAuth iOS/Android client IDs configured
+- [ ] Google OAuth: Web client in app (`GOOGLE_WEB_CLIENT_ID`); Android client in Cloud Console (`com.mvpmms` + SHA-1)
 - [ ] Release keystore backed up securely
 - [ ] Admin default password changed
 - [ ] SMS OTP / Twilio tested if enabled

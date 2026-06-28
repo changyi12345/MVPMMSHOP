@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 import { resetPassword } from '@/lib/api/auth';
+import AuthBrandLogo from '@/components/AuthBrandLogo';
 import { useToast } from '@/components/Toast';
 import { useLang } from '@/lib/useLang';
 import PageMeta from '@/components/PageMeta';
@@ -43,7 +44,7 @@ function ResetForm() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <div className="auth-logo">MVPMMSHOP</div>
+        <AuthBrandLogo />
         <h2 className="auth-title">{t('resetPassword')}</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">

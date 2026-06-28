@@ -12,7 +12,7 @@ import {
 import { colors, spacing, radius } from '../theme/colors';
 import { formatPrice } from '../data/mockData';
 import Button from '../components/Button';
-import AppHeader from '../components/AppHeader';
+import MainHeader from '../components/MainHeader';
 import { fetchProfile, fetchReferralStats, UserProfile } from '../api/user';
 import { fetchShopSettings } from '../api/settings';
 import { sendProfileOtp, verifyProfileOtp } from '../api/phone';
@@ -25,6 +25,7 @@ interface Props {
   onReferralPress?: () => void;
   onOrdersPress?: () => void;
   onLegalPress?: (slug: string, title: string) => void;
+  onChangePasswordPress?: () => void;
   onEventsPress?: () => void;
   onNotificationsPress?: () => void;
   notificationRefreshKey?: number;
@@ -36,6 +37,7 @@ export default function ProfileScreen({
   onReferralPress,
   onOrdersPress,
   onLegalPress,
+  onChangePasswordPress,
   onEventsPress,
   onNotificationsPress,
   notificationRefreshKey,
@@ -117,8 +119,10 @@ export default function ProfileScreen({
     { icon: '🎁', label: t('referralProgram'), onPress: onReferralPress },
     { icon: '📦', label: t('myOrders'), onPress: onOrdersPress },
     { icon: '🔔', label: t('notifications'), onPress: onNotificationsPress },
+    ...(onChangePasswordPress ? [{ icon: '🔒', label: t('changePassword'), onPress: onChangePasswordPress }] : []),
     ...(onEventsPress ? [{ icon: '📰', label: t('eventsNews'), onPress: onEventsPress }] : []),
     ...(onLegalPress ? [{ icon: '❓', label: t('helpFaq'), onPress: () => onLegalPress('faq', t('helpFaq')) }] : []),
+    ...(onLegalPress ? [{ icon: '📞', label: t('contactSupport'), onPress: () => onLegalPress('help', t('contactSupport')) }] : []),
     ...(onLegalPress ? [{ icon: '📄', label: t('termsOfService'), onPress: () => onLegalPress('terms', t('termsOfService')) }] : []),
     ...(onLegalPress ? [{ icon: '🔒', label: t('privacyPolicy'), onPress: () => onLegalPress('privacy', t('privacyPolicy')) }] : []),
   ];
@@ -127,8 +131,7 @@ export default function ProfileScreen({
 
   return (
     <View style={styles.container}>
-      <AppHeader
-        title={t('profile')}
+      <MainHeader
         onNotificationsPress={onNotificationsPress}
         notificationRefreshKey={notificationRefreshKey}
         onLangChange={() => langBump((n) => n + 1)}
@@ -224,11 +227,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: colors.surfaceAlt,
+    borderColor: colors.border,
   },
   avatar: { fontSize: 64, marginBottom: spacing.sm },
-  name: { fontSize: 20, fontWeight: '700', color: colors.white },
-  email: { color: colors.darkGray, marginTop: 4 },
+  name: { fontSize: 20, fontWeight: '700', color: colors.text },
+  email: { color: colors.textMuted, marginTop: 4 },
   walletCard: {
     borderRadius: radius.md,
     padding: spacing.lg,
@@ -247,10 +250,10 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: colors.surfaceAlt,
+    borderColor: colors.border,
   },
-  statValue: { fontSize: 22, fontWeight: '700', color: colors.violetLight },
-  statLabel: { fontSize: 13, color: colors.darkGray, marginTop: 4 },
+  statValue: { fontSize: 22, fontWeight: '700', color: colors.violet },
+  statLabel: { fontSize: 13, color: colors.textMuted, marginTop: 4 },
   phoneCard: {
     backgroundColor: colors.surface,
     borderRadius: radius.md,
@@ -259,15 +262,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.surfaceAlt,
   },
-  phoneTitle: { color: colors.white, fontWeight: '700', marginBottom: 4 },
-  phoneStatus: { color: colors.darkGray, fontSize: 13, marginBottom: spacing.sm },
+  phoneTitle: { color: colors.text, fontWeight: '700', marginBottom: 4 },
+  phoneStatus: { color: colors.textMuted, fontSize: 13, marginBottom: spacing.sm },
   input: {
     borderWidth: 1,
-    borderColor: colors.lightGray,
+    borderColor: colors.border,
     borderRadius: radius.sm,
     padding: spacing.md,
-    color: colors.white,
-    backgroundColor: colors.black,
+    color: colors.text,
+    backgroundColor: colors.surfaceMuted,
     marginBottom: spacing.sm,
   },
   otpActions: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, alignItems: 'center' },
@@ -286,6 +289,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.surfaceAlt,
   },
-  menuText: { fontSize: 16, color: colors.white },
+  menuText: { fontSize: 16, color: colors.text },
   arrow: { color: colors.darkGray },
 });
