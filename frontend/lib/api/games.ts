@@ -159,6 +159,7 @@ export async function fetchPopularGames(limit = 12): Promise<ApiGame[]> {
 
 let popularGamesInflight: Promise<ApiGame[]> | null = null;
 let popularGamesCache: { key: string; data: ApiGame[]; ts: number } | null = null;
+let popularEndpointAvailable: boolean | null = null;
 const POPULAR_GAMES_CLIENT_TTL_MS = 60_000;
 
 async function fetchPopularGamesCached(limit = 12): Promise<ApiGame[]> {
@@ -170,17 +171,24 @@ async function fetchPopularGamesCached(limit = 12): Promise<ApiGame[]> {
   if (popularGamesInflight) return popularGamesInflight;
 
   popularGamesInflight = (async () => {
-    try {
-      const res = await fetch(`${API_BASE}/games/popular?limit=${limit}`, { cache: 'no-store' });
-      if (res.ok) {
-        const data = (await res.json()) as Record<string, unknown>[];
-        const normalized = data.map(normalizeGame);
-        popularGamesCache = { key, data: normalized, ts: Date.now() };
-        return normalized;
+    if (popularEndpointAvailable !== false) {
+      try {
+        const res = await fetch(`${API_BASE}/games/popular?limit=${limit}`, { cache: 'no-store' });
+        if (res.ok) {
+          popularEndpointAvailable = true;
+          const data = (await res.json()) as Record<string, unknown>[];
+          const normalized = data.map(normalizeGame);
+          popularGamesCache = { key, data: normalized, ts: Date.now() };
+          return normalized;
+        }
+        if (res.status === 404) {
+          popularEndpointAvailable = false;
+        }
+      } catch {
+        // Backend unavailable — fall through to /games
       }
-    } catch {
-      // Backend unavailable
     }
+
     const all = await fetchGames();
     const fallback = all.slice(0, limit);
     popularGamesCache = { key, data: fallback, ts: Date.now() };

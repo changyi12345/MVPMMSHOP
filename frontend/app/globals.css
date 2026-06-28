@@ -3109,6 +3109,11 @@ a {
   overflow: hidden;
 }
 
+.user-notif-panel--portal {
+  position: fixed;
+  z-index: 1000;
+}
+
 .user-notif-panel-head {
   display: flex;
   align-items: center;
